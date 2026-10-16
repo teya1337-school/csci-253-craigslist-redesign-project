@@ -1,0 +1,34 @@
+<main class="account-page">
+  <section class="account-card" aria-labelledby="account-heading">
+    <a class="back-link" routerLink="/">← Back to home</a>
+
+    <div class="heading-group">
+      <p class="eyebrow">Your profile</p>
+      <h1 id="account-heading">Account</h1>
+      <p>Review the contact information connected to your account.</p>
+    </div>
+
+    @if (authService.currentUser(); as user) {
+      <dl class="account-details">
+        <div>
+          <dt>Username</dt>
+          <dd>{{ user.username }}</dd>
+        </div>
+        <div>
+          <dt>Email</dt>
+          <dd>{{ user.email }}</dd>
+        </div>
+        <div>
+          <dt>Phone number</dt>
+          <dd>{{ user.phoneNumber }}</dd>
+        </div>
+        <div>
+          <dt>Address</dt>
+          <dd>{{ user.address }}</dd>
+        </div>
+      </dl>
+
+      <p class="read-only-note">Profile editing will be added later.</p>
+    }
+  </section>
+</main>

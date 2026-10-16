@@ -1,0 +1,68 @@
+<main class="general-page">
+  <div class="page-shell">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a routerLink="/">Home</a><span aria-hidden="true">/</span
+      ><span aria-current="page">User profile</span>
+    </nav>
+    @if (isLoading()) {
+      <div class="message-state" role="status">Loading profile…</div>
+    } @else if (errorMessage()) {
+      <section class="message-state error-state" role="alert">
+        <h1>Profile unavailable</h1>
+        <p>{{ errorMessage() }}</p>
+        <button type="button" (click)="retry()">Try again</button><a routerLink="/">Back to home</a>
+      </section>
+    } @else if (profile(); as user) {
+      <header class="page-heading">
+        <div>
+          <p class="eyebrow">User profile</p>
+          <h1>{{ user.username }}</h1>
+          <p>
+            Member since
+            <time [attr.datetime]="user.memberSince">{{
+              user.memberSince | date: 'MMMM yyyy'
+            }}</time>
+          </p>
+        </div>
+      </header>
+      <section class="discussion-section" aria-labelledby="profile-posts-heading">
+        <div class="section-heading">
+          <h2 id="profile-posts-heading">Posts by {{ user.username }}</h2>
+          <span>Newest first</span>
+        </div>
+        @if (user.posts.length === 0) {
+          <div class="empty-state">
+            <h3>No public posts yet</h3>
+            <p>{{ user.username }} has no public posts to show.</p>
+          </div>
+        } @else {
+          <div class="post-list">
+            @for (post of user.posts; track post.id) {
+              <a
+                class="post-card"
+                [routerLink]="['/posts', post.id]"
+                [attr.aria-label]="'Open post: ' + post.title"
+              >
+                <article>
+                  <h3>{{ post.title }}</h3>
+                  <p class="post-meta">
+                    <time [attr.datetime]="post.createdAt">{{
+                      post.createdAt | date: 'mediumDate'
+                    }}</time>
+                    @if (post.editedAt) {
+                      <span aria-hidden="true">·</span
+                      ><app-edited-indicator [editedAt]="post.editedAt" />
+                    }
+                    @if (post.location) {
+                      <span aria-hidden="true">·</span><span>{{ post.location }}</span>
+                    }
+                  </p>
+                </article>
+              </a>
+            }
+          </div>
+        }
+      </section>
+    }
+  </div>
+</main>

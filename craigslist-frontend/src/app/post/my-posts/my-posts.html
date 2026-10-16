@@ -1,0 +1,148 @@
+<main class="my-posts-page">
+  <div class="page-shell">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a routerLink="/">Home</a><span aria-hidden="true">/</span
+      ><span aria-current="page">My Posts</span>
+    </nav>
+    <header class="page-heading">
+      <div>
+        <p class="eyebrow">Your activity</p>
+        <h1 id="my-posts-heading" tabindex="-1">My Posts</h1>
+        <p>Find, edit, and manage the posts you have shared.</p>
+      </div>
+      <a class="create-button" routerLink="/posts/new">Create post</a>
+    </header>
+    <p class="success-message" role="status">{{ statusMessage() }}</p>
+    <section class="posts-section" aria-labelledby="your-posts-heading">
+      <div class="section-heading">
+        <h2 id="your-posts-heading">Your posts</h2>
+        <span>Newest first</span>
+      </div>
+      @if (isLoading()) {
+        <div class="message-state" role="status">Loading your posts…</div>
+      } @else if (errorMessage()) {
+        <div class="message-state" role="alert">
+          <p>{{ errorMessage() }}</p>
+          <button type="button" (click)="loadPosts()">Try again</button>
+          <a routerLink="/login" [queryParams]="{ returnUrl: '/my-posts' }">Sign in</a>
+        </div>
+      } @else if (posts().length === 0) {
+        <div class="message-state">
+          <h3>No posts yet</h3>
+          <p>Your posts will appear here once you publish them.</p>
+          <a routerLink="/posts/new">Create your first post</a>
+        </div>
+      } @else {
+        @for (post of posts(); track post.id) {
+          <article class="post-row">
+            <div class="row-heading">
+              <div class="post-link">
+                <a
+                  class="post-title-link"
+                  [routerLink]="['/posts', post.id]"
+                  [attr.aria-label]="'Open post: ' + post.title"
+                  ><h3>{{ post.title }}</h3></a
+                >
+                <p class="post-meta">
+                  <app-user-link [userId]="post.userId" [username]="post.username" /><span
+                    aria-hidden="true"
+                    >·</span
+                  >
+                  <time [attr.datetime]="post.createdAt">{{
+                    post.createdAt | date: 'mediumDate'
+                  }}</time>
+                  @if (post.editedAt) {
+                    <span aria-hidden="true">·</span
+                    ><app-edited-indicator [editedAt]="post.editedAt" />
+                  }
+                  @if (post.location) {
+                    <span aria-hidden="true">·</span><span>{{ post.location }}</span>
+                  }
+                </p>
+              </div>
+              <div class="menu-container">
+                <button
+                  class="menu-trigger"
+                  type="button"
+                  aria-haspopup="menu"
+                  [attr.aria-label]="'Options for post: ' + post.title"
+                  [attr.aria-expanded]="openMenuId() === post.id"
+                  [attr.aria-controls]="'post-menu-' + post.id"
+                  (click)="toggleMenu(post.id, $event)"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="5" cy="12" r="1.6" />
+                    <circle cx="12" cy="12" r="1.6" />
+                    <circle cx="19" cy="12" r="1.6" />
+                  </svg>
+                </button>
+                @if (openMenuId() === post.id) {
+                  <div
+                    class="post-menu"
+                    role="menu"
+                    aria-label="Post options"
+                    [id]="'post-menu-' + post.id"
+                    (click)="$event.stopPropagation()"
+                    (keydown)="moveMenuFocus($event)"
+                  >
+                    <a
+                      role="menuitem"
+                      [routerLink]="['/posts', post.id, 'edit']"
+                      [queryParams]="{ returnTo: 'my-posts' }"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="m4 16.5-.7 4.2 4.2-.7L19 8.5 15.5 5 4 16.5Zm9.8-9.8 3.5 3.5"
+                        /></svg
+                      >Edit post</a
+                    >
+                    <button
+                      type="button"
+                      role="menuitem"
+                      (click)="confirmDelete(post)"
+                      [disabled]="isDeleting()"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5" /></svg
+                      >Delete post
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+            @if (pendingDelete()?.id === post.id) {
+              <section
+                class="delete-confirmation"
+                [attr.aria-labelledby]="'delete-heading-' + post.id"
+              >
+                <h3 [id]="'delete-heading-' + post.id">Delete this post?</h3>
+                <p>This will remove “{{ post.title }}” from public view.</p>
+                @if (deleteError()) {
+                  <p class="delete-error" role="alert">{{ deleteError() }}</p>
+                }
+                <div class="delete-actions">
+                  <button
+                    class="cancel-delete"
+                    type="button"
+                    (click)="cancelDelete()"
+                    [disabled]="isDeleting()"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    class="confirm-delete"
+                    type="button"
+                    (click)="deletePost()"
+                    [disabled]="isDeleting()"
+                  >
+                    {{ isDeleting() ? 'Deleting…' : 'Delete post' }}
+                  </button>
+                </div>
+              </section>
+            }
+          </article>
+        }
+      }
+    </section>
+  </div>
+</main>

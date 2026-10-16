@@ -1,0 +1,93 @@
+<header class="site-header">
+  <div class="header-shell">
+    <a class="brand" routerLink="/" aria-label="Fresno Exchange home">
+      <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
+        <path
+          d="M8 10h25a7 7 0 0 1 7 7v9a7 7 0 0 1-7 7H21l-9 7v-7H8a7 7 0 0 1-7-7v-9a7 7 0 0 1 7-7Z"
+        />
+        <path d="M16 18h16M16 25h10" />
+      </svg>
+      <span class="brand-copy">
+        <strong>Fresno Exchange</strong>
+        <small>local posts &amp; discussions</small>
+      </span>
+    </a>
+
+    <nav aria-label="Primary navigation">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+        >Home</a
+      >
+      @if (authService.isAuthenticated()) {
+        <a routerLink="/my-posts" routerLinkActive="active" ariaCurrentWhenActive="page"
+          >My Posts</a
+        >
+      }
+    </nav>
+
+    <div class="account-actions">
+      @if (authService.currentUser(); as user) {
+        <div class="account-menu-container">
+          <button
+            #accountTrigger
+            class="account-icon-button"
+            type="button"
+            aria-haspopup="menu"
+            aria-controls="account-menu"
+            [attr.aria-expanded]="isAccountMenuOpen()"
+            [attr.aria-label]="'Open account menu for ' + user.username"
+            (click)="toggleAccountMenu()"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="8" r="4"></circle>
+              <path d="M4.5 20c.6-4.1 3.2-6.2 7.5-6.2s6.9 2.1 7.5 6.2"></path>
+            </svg>
+            <span class="status-dot" aria-hidden="true"></span>
+          </button>
+
+          @if (isAccountMenuOpen()) {
+            <div
+              id="account-menu"
+              class="account-menu"
+              role="menu"
+              aria-label="Account menu"
+              (keydown)="handleMenuKeydown($event)"
+            >
+              <div class="account-menu-identity" role="none">
+                <span>Signed in as</span>
+                <strong>{{ user.username }}</strong>
+              </div>
+
+              <a #menuItem role="menuitem" routerLink="/account" (click)="closeAccountMenu()">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="8" r="3.5"></circle>
+                  <path d="M5 20c.6-3.8 3-5.7 7-5.7s6.4 1.9 7 5.7"></path>
+                </svg>
+                Account
+              </a>
+
+              <button
+                #menuItem
+                class="sign-out-menu-item"
+                type="button"
+                role="menuitem"
+                (click)="logout()"
+                [disabled]="isSigningOut()"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M10 5H5v14h5M14 8l4 4-4 4M8 12h10"></path>
+                </svg>
+                {{ isSigningOut() ? 'Signing out…' : 'Sign out' }}
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <a class="account-button" routerLink="/login" routerLinkActive="active">Sign in</a>
+      }
+    </div>
+  </div>
+
+  @if (signOutError()) {
+    <p class="header-alert" role="alert">{{ signOutError() }}</p>
+  }
+</header>

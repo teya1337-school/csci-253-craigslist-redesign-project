@@ -1,0 +1,83 @@
+<main class="general-page">
+  <div class="page-shell">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a routerLink="/">Home</a>
+      <span aria-hidden="true">/</span>
+      <a routerLink="/community">Community</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">General</span>
+    </nav>
+
+    <header class="page-heading">
+      <div>
+        <p class="eyebrow">Community</p>
+        <h1>General</h1>
+        <p>Everyday local conversations, questions, and shared information.</p>
+      </div>
+      @if (authService.isAuthenticated()) {
+        <a class="create-button" routerLink="/community/general/new">Create post</a>
+      }
+    </header>
+
+    @if (postCreated()) {
+      <div class="success-alert" role="status">Your post was published.</div>
+    } @else if (postDeleted()) {
+      <div class="success-alert" role="status">Your post was deleted.</div>
+    }
+
+    <section class="discussion-section" aria-labelledby="discussions-heading">
+      <div class="section-heading">
+        <h2 id="discussions-heading">Discussions</h2>
+        <span>Newest first</span>
+      </div>
+
+      @if (isLoading()) {
+        <div class="message-state" role="status">Loading discussions…</div>
+      } @else if (errorMessage()) {
+        <div class="message-state error-state" role="alert">
+          <p>{{ errorMessage() }}</p>
+          <button type="button" (click)="loadPosts()">Try again</button>
+        </div>
+      } @else if (posts().length === 0) {
+        <div class="empty-state">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <path
+              d="M9 10h24a7 7 0 0 1 7 7v9a7 7 0 0 1-7 7H21l-9 7v-7H9a7 7 0 0 1-7-7v-9a7 7 0 0 1 7-7Z"
+            ></path>
+            <path d="M16 19h12M16 25h8"></path>
+          </svg>
+          <h3>No discussions yet</h3>
+          <p>Be the first person to start a General community discussion.</p>
+        </div>
+      } @else {
+        <div class="post-list">
+          @for (post of posts(); track post.id) {
+            <article class="post-card">
+              <a
+                class="post-title-link"
+                [routerLink]="['/posts', post.id]"
+                [attr.aria-label]="'Open post: ' + post.title"
+                ><h3>{{ post.title }}</h3></a
+              >
+              <p class="post-meta">
+                Posted by <app-user-link [userId]="post.userId" [username]="post.username" />
+                <span aria-hidden="true">·</span>
+                <time [attr.datetime]="post.createdAt">{{
+                  post.createdAt | date: 'mediumDate'
+                }}</time>
+                @if (post.editedAt) {
+                  <span aria-hidden="true">·</span>
+                  <app-edited-indicator [editedAt]="post.editedAt" />
+                }
+                @if (post.location) {
+                  <span aria-hidden="true">·</span>
+                  <span>{{ post.location }}</span>
+                }
+              </p>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  </div>
+</main>

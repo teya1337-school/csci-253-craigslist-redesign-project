@@ -1,0 +1,110 @@
+:host {
+  display: block;
+}
+
+.account-page {
+  min-height: calc(100vh - 77px);
+  padding: 56px 20px;
+  background: linear-gradient(180deg, #faf8fb 0%, #fff 55%);
+}
+
+.account-card {
+  width: min(100%, 680px);
+  margin: 0 auto;
+  padding: 34px;
+  border: 1px solid #ded8e2;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 16px 42px rgba(44, 30, 53, 0.08);
+}
+
+.back-link {
+  color: #643083;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.back-link:focus-visible {
+  outline: 3px solid #8c5dad;
+  outline-offset: 3px;
+}
+
+.heading-group {
+  margin: 30px 0;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: #6d378e;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  color: #302734;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2rem, 5vw, 2.65rem);
+}
+
+.heading-group > p:last-child {
+  margin: 10px 0 0;
+  color: #6d6672;
+  line-height: 1.55;
+}
+
+.account-details {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.account-details div {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #e5e0e8;
+  border-radius: 10px;
+  background: #fbfafc;
+}
+
+.account-details dt {
+  margin-bottom: 6px;
+  color: #756d79;
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.account-details dd {
+  margin: 0;
+  color: #302b33;
+  font-weight: 650;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.read-only-note {
+  margin: 22px 0 0;
+  color: #756d79;
+  font-size: 0.86rem;
+}
+
+@media (max-width: 600px) {
+  .account-page {
+    padding: 28px 14px;
+  }
+
+  .account-card {
+    padding: 24px 20px;
+  }
+
+  .account-details {
+    grid-template-columns: 1fr;
+  }
+}

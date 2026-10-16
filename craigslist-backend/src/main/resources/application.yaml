@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+logging:
+  level:
+    com.teya1337.craigslist: DEBUG
+
+spring:
+  application:
+    name: craigslist-backend
+  config:
+    import:
+      - "optional:file:../.env[.properties]"
+      - "optional:file:./.env[.properties]"
+  datasource:
+    url: jdbc:postgresql://localhost:5432/craigslist?currentSchema=public&reWriteBatchedInserts=true
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  session:
+    timeout: 30m
+    data:
+      redis:
+        namespace: "craigslist:session"
+        repository-type: default
+        flush-mode: on-save
+        save-mode: on-set-attribute

@@ -1,0 +1,359 @@
+:host {
+  display: block;
+}
+
+.post-page {
+  min-height: calc(100dvh - 77px);
+  padding: 42px 20px 72px;
+  background: linear-gradient(180deg, #faf8fb 0%, #fff 52%);
+}
+
+.page-shell {
+  width: min(100%, 900px);
+  margin: 0 auto;
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #746d78;
+  font-size: 0.88rem;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.breadcrumbs a,
+.back-link {
+  color: #643083;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover,
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.post-card,
+.message-card {
+  margin-top: 30px;
+  border: 1px solid #ded8e2;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(45, 29, 55, 0.07);
+}
+
+.success-alert {
+  margin-top: 24px;
+  padding: 13px 15px;
+  border: 1px solid #acd2b5;
+  border-radius: 8px;
+  background: #edf8ef;
+  color: #255f32;
+  font-weight: 700;
+}
+
+.success-alert + .post-card {
+  margin-top: 16px;
+}
+
+.post-card header {
+  position: relative;
+  padding: 32px 76px 28px 34px;
+  border-bottom: 1px solid #e7e2e9;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: #6d378e;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  color: #302734;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2rem, 5vw, 2.85rem);
+  line-height: 1.15;
+}
+
+.post-meta {
+  margin: 14px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: #756e78;
+  font-size: 0.9rem;
+}
+
+.post-meta strong {
+  color: #59316d;
+}
+
+.post-location {
+  margin: 14px 0 0;
+  color: #5c5560;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.post-location span {
+  margin-right: 4px;
+  color: #764292;
+}
+
+.post-body {
+  padding: 32px 34px 38px;
+  color: #403a43;
+  font-size: 1.02rem;
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+.back-link {
+  margin-top: 22px;
+  display: inline-block;
+}
+
+.delete-confirmation button {
+  min-height: 42px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.confirm-delete-button:hover:not(:disabled) {
+  background: #fbeff0;
+}
+
+.post-menu-container {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+}
+
+.post-menu-trigger {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: #655d69;
+  cursor: pointer;
+}
+
+.post-menu-trigger:hover,
+.post-menu-trigger[aria-expanded='true'] {
+  border-color: #d9d0df;
+  background: #f3edf6;
+  color: #5f2e7d;
+}
+
+.post-menu-trigger svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.post-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 2;
+  width: 180px;
+  padding: 7px;
+  border: 1px solid #d8d1dc;
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(31, 23, 39, 0.16);
+}
+
+.post-menu a,
+.post-menu button {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #37313b;
+  font: inherit;
+  font-weight: 650;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.post-menu a:hover,
+.post-menu button:hover {
+  background: #f5eff8;
+  color: #542474;
+}
+
+.post-menu button {
+  color: #852f38;
+}
+
+.post-menu svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.delete-confirmation {
+  margin-top: 14px;
+  padding: 20px;
+  display: grid;
+  gap: 16px;
+  border: 1px solid #d9a6ab;
+  border-radius: 10px;
+  background: #fff8f8;
+}
+
+.delete-confirmation h2,
+.delete-confirmation p {
+  margin: 0;
+}
+
+.delete-confirmation h2 {
+  color: #62262d;
+  font-size: 1.1rem;
+}
+
+.delete-confirmation p {
+  margin-top: 5px;
+  color: #71575a;
+}
+
+.delete-confirmation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.delete-confirmation button {
+  border: 1px solid #a49da6;
+  background: #fff;
+  color: #4e4751;
+}
+
+.delete-confirmation .confirm-delete-button {
+  border-color: #963b45;
+  background: #963b45;
+  color: #fff;
+}
+
+.delete-confirmation button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.delete-confirmation .delete-error {
+  color: #842121;
+  font-weight: 650;
+}
+
+.message-card {
+  min-height: 230px;
+  padding: 38px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  color: #6b646f;
+  text-align: center;
+}
+
+.error-card h1,
+.error-card p {
+  margin: 0;
+}
+
+.error-card p {
+  color: #842121;
+}
+
+.error-actions {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.error-actions a,
+.error-actions button {
+  min-height: 42px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #79508e;
+  border-radius: 7px;
+  background: #fff;
+  color: #5f2e7d;
+  font: inherit;
+  font-weight: 750;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.breadcrumbs a:focus-visible,
+.back-link:focus-visible,
+.post-menu-trigger:focus-visible,
+.post-menu a:focus-visible,
+.post-menu button:focus-visible,
+.delete-confirmation button:focus-visible,
+.error-actions a:focus-visible,
+.error-actions button:focus-visible {
+  outline: 3px solid #8c5dad;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .post-page {
+    padding: 28px 14px 52px;
+  }
+
+  .post-card header,
+  .post-body {
+    padding: 24px 20px;
+  }
+
+  .post-card header {
+    padding-right: 64px;
+  }
+
+  .post-menu-container {
+    top: 14px;
+    right: 14px;
+  }
+
+  .error-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .delete-confirmation-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

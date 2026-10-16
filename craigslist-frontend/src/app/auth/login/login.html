@@ -1,0 +1,69 @@
+<main class="login-page">
+  <section class="login-card" aria-labelledby="login-heading">
+    <a class="back-link" routerLink="/">← Back to home</a>
+
+    <div class="heading-group">
+      <p class="eyebrow">Account</p>
+      <h1 id="login-heading">Sign in</h1>
+      <p>Sign in to create posts, comment, and manage your activity.</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="submit()" novalidate>
+      @if (errorMessage()) {
+        <div class="alert" role="alert">{{ errorMessage() }}</div>
+      }
+
+      <div class="field">
+        <label for="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          formControlName="username"
+          autocomplete="username"
+          autocapitalize="none"
+          spellcheck="false"
+          [attr.aria-invalid]="loginForm.controls.username.invalid && loginForm.controls.username.touched"
+          aria-describedby="username-error"
+        />
+        @if (loginForm.controls.username.invalid && loginForm.controls.username.touched) {
+          <p id="username-error" class="field-error">Enter your username.</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="password-field">
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="current-password"
+            [attr.aria-invalid]="loginForm.controls.password.invalid && loginForm.controls.password.touched"
+            aria-describedby="password-error"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+          >
+            {{ showPassword() ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+        @if (loginForm.controls.password.invalid && loginForm.controls.password.touched) {
+          <p id="password-error" class="field-error">Enter your password.</p>
+        }
+      </div>
+
+      <button class="submit-button" type="submit" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Signing in…' : 'Sign in' }}
+      </button>
+    </form>
+
+    <aside class="test-accounts" aria-label="Prototype test accounts">
+      <strong>Prototype test accounts</strong>
+      <span><code>alice</code> / <code>alice</code></span>
+      <span><code>bob</code> / <code>bob</code></span>
+    </aside>
+  </section>
+</main>

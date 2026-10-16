@@ -1,0 +1,130 @@
+<main class="post-page">
+  <div class="page-shell">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a routerLink="/">Home</a>
+      <span aria-hidden="true">/</span>
+      <a routerLink="/community">Community</a>
+      <span aria-hidden="true">/</span>
+      <a routerLink="/community/general">General</a>
+      @if (post()) {
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Post</span>
+      }
+    </nav>
+
+    @if (isLoading()) {
+      <section class="message-card" role="status">Loading post…</section>
+    } @else if (errorMessage()) {
+      <section class="message-card error-card" role="alert">
+        <h1>Post unavailable</h1>
+        <p>{{ errorMessage() }}</p>
+        <div class="error-actions">
+          <a routerLink="/community/general">Back to General</a>
+          <button type="button" (click)="loadPost()">Try again</button>
+        </div>
+      </section>
+    } @else if (post(); as post) {
+      @if (wasUpdated()) {
+        <div class="success-alert" role="status">Your changes were saved.</div>
+      }
+
+      <article class="post-card">
+        <header>
+          @if (isOwner()) {
+            <div #postMenu class="post-menu-container">
+              <button
+                #postMenuTrigger
+                class="post-menu-trigger"
+                type="button"
+                aria-haspopup="menu"
+                aria-controls="post-actions-menu"
+                aria-label="Post options"
+                [attr.aria-expanded]="isPostMenuOpen()"
+                (click)="togglePostMenu()"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="5" cy="12" r="1.6"></circle>
+                  <circle cx="12" cy="12" r="1.6"></circle>
+                  <circle cx="19" cy="12" r="1.6"></circle>
+                </svg>
+              </button>
+
+              @if (isPostMenuOpen()) {
+                <div id="post-actions-menu" class="post-menu" role="menu" aria-label="Post options">
+                  <a
+                    role="menuitem"
+                    [routerLink]="['/posts', post.id, 'edit']"
+                    (click)="closePostMenu()"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="m4 16.5-.7 4.2 4.2-.7L19 8.5 15.5 5 4 16.5Z"></path>
+                      <path d="m13.8 6.7 3.5 3.5"></path>
+                    </svg>
+                    Edit post
+                  </a>
+                  <button type="button" role="menuitem" (click)="showDeleteConfirmation()">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"></path>
+                    </svg>
+                    Delete post
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          <p class="eyebrow">Community / General</p>
+          <h1>{{ post.title }}</h1>
+          <p class="post-meta">
+            Posted by <app-user-link [userId]="post.userId" [username]="post.username" />
+            <span aria-hidden="true">·</span>
+            <time [attr.datetime]="post.createdAt">{{ post.createdAt | date: 'medium' }}</time>
+            @if (post.editedAt) {
+              <span aria-hidden="true">·</span>
+              <app-edited-indicator [editedAt]="post.editedAt" />
+            }
+          </p>
+          @if (post.location) {
+            <p class="post-location">
+              <span aria-hidden="true">⌖</span>
+              {{ post.location }}
+            </p>
+          }
+        </header>
+
+        <div class="post-body">{{ post.body }}</div>
+      </article>
+
+      @if (isOwner()) {
+        @if (isConfirmingDelete()) {
+          <section class="delete-confirmation" aria-labelledby="delete-heading">
+            <div>
+              <h2 id="delete-heading">Delete this post?</h2>
+              <p>This will remove the post from public view.</p>
+            </div>
+            @if (deleteError()) {
+              <p class="delete-error" role="alert">{{ deleteError() }}</p>
+            }
+            <div class="delete-confirmation-actions">
+              <button type="button" (click)="cancelDelete()" [disabled]="isDeleting()">
+                Cancel
+              </button>
+              <button
+                class="confirm-delete-button"
+                type="button"
+                (click)="deletePost()"
+                [disabled]="isDeleting()"
+              >
+                {{ isDeleting() ? 'Deleting…' : 'Delete post' }}
+              </button>
+            </div>
+          </section>
+        }
+      }
+
+      <app-post-comments [postId]="post.id" />
+
+      <a class="back-link" routerLink="/community/general">← Back to General discussions</a>
+    }
+  </div>
+</main>

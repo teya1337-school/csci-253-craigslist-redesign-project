@@ -1,0 +1,259 @@
+<section class="comments-section" aria-labelledby="comments-heading">
+  <header class="comments-heading">
+    <h2 id="comments-heading">Comments</h2>
+    <span>{{ commentCount() }}</span>
+  </header>
+
+  @if (authService.isAuthenticated()) {
+    <div class="comment-composer">
+      @if (isFormOpen() && !replyTarget()) {
+        <ng-container *ngTemplateOutlet="composer" />
+      } @else {
+        <button type="button" class="open-composer" (click)="openForm()">
+          Join the conversation
+        </button>
+      }
+    </div>
+  } @else {
+    <a
+      class="sign-in-prompt"
+      routerLink="/login"
+      [queryParams]="{ returnUrl: '/posts/' + postId() }"
+    >
+      Sign in to join the conversation
+    </a>
+  }
+
+  @if (isLoading()) {
+    <div class="comments-message" role="status">Loading comments…</div>
+  } @else if (loadError()) {
+    <div class="comments-message error-message" role="alert">
+      <p>{{ loadError() }}</p>
+      <button type="button" (click)="loadComments()">Try again</button>
+    </div>
+  } @else if (comments().length === 0) {
+    <div class="comments-message empty-message">
+      <h3>No comments yet</h3>
+      <p>Be the first person to join the conversation.</p>
+    </div>
+  } @else {
+    <div class="comment-list">
+      @for (row of threadedComments(); track row.comment.id) {
+        @let comment = row.comment;
+        <article
+          class="comment-card"
+          [class.is-reply]="row.depth > 0"
+          [style.margin-left.px]="row.depth > 0 ? 16 + 12 * (row.depth > 3 ? 2 : row.depth - 1) : 0"
+          [id]="'comment-' + comment.id"
+          tabindex="-1"
+        >
+          @if (row.parentName) {
+            <a
+              class="reply-context"
+              [routerLink]="[]"
+              [fragment]="'comment-' + comment.parentId"
+              (click)="focusComment(comment.parentId)"
+              >Reply to {{ row.parentName }}</a
+            >
+          }
+          <header class="comment-header">
+            <div class="comment-meta">
+              <app-user-link [userId]="comment.userId" [username]="comment.username" />
+              <span aria-hidden="true">·</span>
+              <time [attr.datetime]="comment.createdAt">{{
+                comment.createdAt | date: 'medium'
+              }}</time>
+              @if (comment.editedAt && !comment.deleted) {
+                <span aria-hidden="true">·</span>
+                <app-edited-indicator [editedAt]="comment.editedAt" />
+              }
+            </div>
+
+            @if (ownsComment(comment)) {
+              <div class="comment-menu-container">
+                <button
+                  class="comment-menu-trigger"
+                  type="button"
+                  aria-haspopup="menu"
+                  [attr.aria-controls]="'comment-menu-' + comment.id"
+                  [attr.aria-expanded]="openCommentMenuId() === comment.id"
+                  [attr.aria-label]="'Options for comment by ' + comment.username"
+                  (click)="toggleCommentMenu(comment.id, $event)"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="5" cy="12" r="1.6"></circle>
+                    <circle cx="12" cy="12" r="1.6"></circle>
+                    <circle cx="19" cy="12" r="1.6"></circle>
+                  </svg>
+                </button>
+
+                @if (openCommentMenuId() === comment.id) {
+                  <div
+                    class="comment-menu"
+                    role="menu"
+                    [id]="'comment-menu-' + comment.id"
+                    aria-label="Comment options"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <button type="button" role="menuitem" (click)="startEditing(comment)">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m4 16.5-.7 4.2 4.2-.7L19 8.5 15.5 5 4 16.5Z"></path>
+                        <path d="m13.8 6.7 3.5 3.5"></path>
+                      </svg>
+                      Edit comment
+                    </button>
+                    <button type="button" role="menuitem" (click)="showDeleteConfirmation(comment)">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"></path>
+                      </svg>
+                      Delete comment
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </header>
+
+          @if (editingCommentId() === comment.id) {
+            <form
+              class="edit-comment-form"
+              [formGroup]="editCommentForm"
+              (ngSubmit)="saveComment(comment)"
+              novalidate
+            >
+              <label [for]="'edit-comment-' + comment.id">Edit comment</label>
+              <textarea
+                [id]="'edit-comment-' + comment.id"
+                formControlName="content"
+                rows="4"
+                autofocus
+                [attr.aria-invalid]="
+                  editCommentForm.controls.content.invalid &&
+                  editCommentForm.controls.content.touched
+                "
+              ></textarea>
+              @if (
+                editCommentForm.controls.content.invalid && editCommentForm.controls.content.touched
+              ) {
+                <p class="form-error">Enter a comment before saving.</p>
+              }
+              @if (commentActionError()) {
+                <p class="form-error" role="alert">{{ commentActionError() }}</p>
+              }
+              <div class="comment-action-buttons">
+                <button type="button" (click)="cancelEditing()" [disabled]="isManagingComment()">
+                  Cancel
+                </button>
+                <button class="save-comment-button" type="submit" [disabled]="isManagingComment()">
+                  {{ isManagingComment() ? 'Saving…' : 'Save changes' }}
+                </button>
+              </div>
+            </form>
+          } @else {
+            <p class="comment-content">{{ comment.content }}</p>
+          }
+
+          @if (pendingDeleteCommentId() === comment.id) {
+            <section class="delete-comment-confirmation" aria-labelledby="delete-comment-heading">
+              <div>
+                <h3 id="delete-comment-heading">Delete this comment?</h3>
+                <p>Your comment will be removed. Replies will remain in the discussion.</p>
+              </div>
+              @if (commentActionError()) {
+                <p class="form-error" role="alert">{{ commentActionError() }}</p>
+              }
+              <div class="comment-action-buttons">
+                <button type="button" (click)="cancelDelete()" [disabled]="isManagingComment()">
+                  Cancel
+                </button>
+                <button
+                  class="delete-comment-button"
+                  type="button"
+                  (click)="deleteComment(comment)"
+                  [disabled]="isManagingComment()"
+                >
+                  {{ isManagingComment() ? 'Deleting…' : 'Delete comment' }}
+                </button>
+              </div>
+            </section>
+          }
+          @if (!comment.deleted) {
+            @if (authService.isAuthenticated()) {
+              <button
+                class="reply-button"
+                type="button"
+                (click)="startReply(comment, $event)"
+                [disabled]="isSubmitting()"
+                [attr.aria-expanded]="isFormOpen() && replyTarget()?.id === comment.id"
+                [attr.aria-label]="'Reply to ' + comment.username"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m9 5-6 6 6 6M3 11h10a7 7 0 0 1 7 7" />
+                </svg>
+                Reply
+              </button>
+            } @else {
+              <a
+                class="reply-button"
+                routerLink="/login"
+                [queryParams]="{ returnUrl: '/posts/' + postId() }"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m9 5-6 6 6 6M3 11h10a7 7 0 0 1 7 7" />
+                </svg>
+                Sign in to reply
+              </a>
+            }
+          }
+          @if (authService.isAuthenticated() && isFormOpen() && replyTarget()?.id === comment.id) {
+            <div class="comment-composer"><ng-container *ngTemplateOutlet="composer" /></div>
+          }
+        </article>
+      }
+    </div>
+  }
+</section>
+
+<p class="reply-status" role="status">{{ statusMessage() }}</p>
+<ng-template #composer>
+  <form [formGroup]="commentForm" (ngSubmit)="submitComment()" novalidate>
+    <label for="comment-content">{{
+      replyTarget() ? 'Reply to ' + replyTarget()!.username : 'Join the conversation'
+    }}</label>
+    <textarea
+      #composerInput
+      id="comment-content"
+      formControlName="content"
+      rows="5"
+      autofocus
+      [placeholder]="replyTarget() ? 'Write a reply' : 'Write a comment'"
+      [attr.aria-invalid]="
+        commentForm.controls.content.invalid && commentForm.controls.content.touched
+      "
+      aria-describedby="comment-error"
+    ></textarea>
+
+    @if (commentForm.controls.content.invalid && commentForm.controls.content.touched) {
+      <p id="comment-error" class="form-error">
+        {{ replyTarget() ? 'Enter a reply before posting.' : 'Enter a comment before posting.' }}
+      </p>
+    }
+    @if (submitError()) {
+      <p class="form-error" role="alert">{{ submitError() }}</p>
+    }
+
+    <div class="composer-actions">
+      <button
+        type="button"
+        class="cancel-button"
+        (click)="cancelComment()"
+        [disabled]="isSubmitting()"
+      >
+        Cancel
+      </button>
+      <button type="submit" class="submit-button" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Posting…' : replyTarget() ? 'Post reply' : 'Post comment' }}
+      </button>
+    </div>
+  </form>
+</ng-template>

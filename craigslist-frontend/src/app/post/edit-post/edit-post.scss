@@ -1,0 +1,16 @@
+@use '../create-post/create-post.scss';
+
+.message-card {
+  min-height: 230px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  color: #6b646f;
+  text-align: center;
+}
+
+.message-card h1,
+.message-card p {
+  margin: 0;
+}

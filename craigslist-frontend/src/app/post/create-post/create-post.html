@@ -1,0 +1,111 @@
+<main class="create-post-page">
+  <div class="page-shell">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a routerLink="/">Home</a>
+      <span aria-hidden="true">/</span>
+      @if (fromMyPosts) {
+        <a routerLink="/my-posts">My Posts</a>
+      } @else {
+        <a routerLink="/community">Community</a>
+        <span aria-hidden="true">/</span>
+        <a routerLink="/community/general">General</a>
+      }
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Create post</span>
+    </nav>
+
+    <section class="form-card" aria-labelledby="create-post-heading">
+      <header class="heading-group">
+        <p class="eyebrow">{{ fromMyPosts ? 'Your activity' : 'Community / General' }}</p>
+        <h1 id="create-post-heading">Create a post</h1>
+        <p>
+          Posting as <strong>{{ authService.currentUser()?.username }}</strong>
+        </p>
+      </header>
+
+      <form [formGroup]="postForm" (ngSubmit)="submit()" novalidate>
+        @if (errorMessage()) {
+          <div class="alert" role="alert">{{ errorMessage() }}</div>
+        }
+
+        @if (fromMyPosts) {
+          <app-destination-picker
+            [(destination)]="destination"
+            [showError]="destinationError()"
+            [disabled]="isSubmitting()"
+          />
+        }
+
+        <div class="field">
+          <div class="label-row">
+            <label for="title">Title</label>
+            <span>{{ postForm.controls.title.value.length }}/200</span>
+          </div>
+          <input
+            id="title"
+            type="text"
+            formControlName="title"
+            maxlength="200"
+            autocomplete="off"
+            [attr.aria-invalid]="postForm.controls.title.invalid && postForm.controls.title.touched"
+            aria-describedby="title-hint title-error"
+          />
+          <p id="title-hint" class="field-hint">
+            Use a short title that clearly describes your topic.
+          </p>
+          @if (postForm.controls.title.invalid && postForm.controls.title.touched) {
+            <p id="title-error" class="field-error">Enter a title of 200 characters or fewer.</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="body">Post</label>
+          <textarea
+            id="body"
+            formControlName="body"
+            rows="9"
+            [attr.aria-invalid]="postForm.controls.body.invalid && postForm.controls.body.touched"
+            aria-describedby="body-hint body-error"
+          ></textarea>
+          <p id="body-hint" class="field-hint">
+            Share the question, information, or details people need.
+          </p>
+          @if (postForm.controls.body.invalid && postForm.controls.body.touched) {
+            <p id="body-error" class="field-error">Enter the content of your post.</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="location">Location or venue <span class="optional">(optional)</span></label>
+          <input
+            id="location"
+            type="text"
+            formControlName="location"
+            maxlength="255"
+            autocomplete="off"
+            [attr.aria-invalid]="
+              postForm.controls.location.invalid && postForm.controls.location.touched
+            "
+            aria-describedby="location-hint location-error"
+          />
+          <p id="location-hint" class="field-hint">
+            Examples: Woodward Park, Tower District, Fresno State Library, or Online. Avoid sharing
+            a private home address.
+          </p>
+          @if (postForm.controls.location.invalid && postForm.controls.location.touched) {
+            <p id="location-error" class="field-error">Use 255 characters or fewer.</p>
+          }
+        </div>
+
+        <div class="form-actions">
+          <a class="cancel-button" [routerLink]="fromMyPosts ? '/my-posts' : '/community/general'"
+            >Cancel</a
+          >
+          <button class="submit-button" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Publishing…' : 'Publish post' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</main>

@@ -49,7 +49,7 @@ export class Account {
   });
   protected readonly passwordForm = this.formBuilder.nonNullable.group({
     currentPassword: ['', [Validators.required, Validators.maxLength(200)]],
-    newPassword: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
+    newPassword: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(72)]],
     confirmPassword: ['', Validators.required],
   });
 

@@ -183,12 +183,12 @@
               aria-describedby="password-hint"
             />
             <p class="hint" id="password-hint">
-              Use 8–72 characters, different from your current password.
+              Use 3–72 characters, different from your current password.
             </p>
             @if (
               passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.invalid
             ) {
-              <p class="error" role="alert">Enter a new password with 8–72 characters.</p>
+              <p class="error" role="alert">Enter a new password with 3–72 characters.</p>
             }
           </div>
           <div class="field">
@@ -241,15 +241,15 @@
         </button>
       } @else {
         <p>
-          Your account will be deactivated and you will be signed out. You will no longer be able to
-          sign in or use your public profile.
+          Your account will be deleted and you will be signed out. Your personal information and
+          profile picture will be removed. You will no longer be able to sign in with this account.
         </p>
         <p>
           Your posts, comments, and messages sent to others will remain under
           <strong>[deleted]</strong> to preserve discussions. Other people will no longer be able to
           message you.
         </p>
-        <p>You cannot undo this from the website.</p>
+        <p>This cannot be undone.</p>
         <form [formGroup]="deleteForm" (ngSubmit)="deleteAccount()">
           <div class="field">
             <label for="delete-current-password">Current password</label>

@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../auth.service';
+import { accountReturnUrl } from '../return-url';
 
 @Component({
   selector: 'app-login',
@@ -17,6 +18,10 @@ export class Login {
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
 
+  protected readonly registered = this.route.snapshot.queryParamMap.get('registered') === 'true';
+  protected readonly returnUrl = accountReturnUrl(
+    this.route.snapshot.queryParamMap.get('returnUrl'),
+  );
   protected readonly isSubmitting = signal(false);
   protected readonly showPassword = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
@@ -47,15 +52,15 @@ export class Login {
       )
       .subscribe({
         next: () => {
-          const requestedUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-          const returnUrl = requestedUrl?.startsWith('/') && !requestedUrl.startsWith('//') ? requestedUrl : '/';
-          void this.router.navigateByUrl(returnUrl);
+          void this.router.navigateByUrl(this.returnUrl);
         },
         error: (error: HttpErrorResponse) => {
           if (error.status === 401) {
             this.errorMessage.set('The username or password is incorrect. Please try again.');
           } else if (error.status === 0 || error.status === 502 || error.status === 504) {
-            this.errorMessage.set('The service is unavailable right now. Please try again shortly.');
+            this.errorMessage.set(
+              'The service is unavailable right now. Please try again shortly.',
+            );
           } else {
             this.errorMessage.set('We could not sign you in. Please try again.');
           }

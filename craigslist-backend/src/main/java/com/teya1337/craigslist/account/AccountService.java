@@ -5,6 +5,7 @@ import com.teya1337.craigslist.user.profile.ProfileUpdateRequest;
 import com.teya1337.craigslist.user.entity.User;
 import com.teya1337.craigslist.user.entity.UserStatus;
 import com.teya1337.craigslist.user.repository.UserRepository;
+import com.teya1337.craigslist.user.picture.ProfilePictureRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class AccountService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProfilePictureRepository profilePictureRepository;
 
     @Transactional
     public UserPrincipal updateAccount(UUID userId, AccountRequest request) {
@@ -64,7 +66,17 @@ public class AccountService {
         if (!request.confirmed()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Confirm that you want to delete your account.");
         }
-        user.setStatus(UserStatus.INACTIVE);
+        user.setStatus(UserStatus.DELETED);
+        user.setUsername("deleted:" + userId);
+        user.setPrivateEmail("deleted-" + userId + "@deleted.invalid");
+        user.setPassword("");
+        user.setPrivatePhoneNumber("");
+        user.setAddress("");
+        user.setBio(null);
+        user.setPublicEmail(null);
+        user.setPublicPhoneNumber(null);
+        user.setPictureVersion(null);
+        profilePictureRepository.deleteById(userId);
         userRepository.saveAndFlush(user);
     }
 

@@ -5,5 +5,5 @@ export interface AuthenticatedUser {
   username: string;
   privatePhoneNumber: string;
   address: string;
-  status: 'ACTIVE' | 'INACTIVE';
+  status: 'ACTIVE' | 'DELETED';
 }

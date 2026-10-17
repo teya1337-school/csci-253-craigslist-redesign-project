@@ -44,7 +44,7 @@ class DirectMessageServiceTests {
         assertThatThrownBy(() -> service.send(alice.getId(), new DirectMessageRequest(alice.getId(), "Hi", "Text")))
                 .isInstanceOf(ResponseStatusException.class);
         when(users.findById(alice.getId())).thenReturn(Optional.of(alice));
-        bob.setStatus(UserStatus.INACTIVE);
+        bob.setStatus(UserStatus.DELETED);
         when(users.findById(bob.getId())).thenReturn(Optional.of(bob));
         assertThatThrownBy(() -> service.send(alice.getId(), new DirectMessageRequest(bob.getId(), "Hi", "Text")))
                 .isInstanceOf(ResourceNotFoundException.class);

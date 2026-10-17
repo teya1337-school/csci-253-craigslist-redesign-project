@@ -6,6 +6,7 @@ import { MyPosts } from './post/my-posts/my-posts';
 import { Routes } from '@angular/router';
 import { Account } from './account/account';
 import { authGuard } from './auth/auth.guard';
+import { Signup } from './auth/signup/signup';
 import { Login } from './auth/login/login';
 import { Community } from './community/community';
 import { General } from './community/general/general';
@@ -78,6 +79,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     title: 'New message | Fresno Exchange',
   },
+  { path: 'signup', component: Signup, title: 'Create account | Fresno Exchange' },
   { path: 'login', component: Login, title: 'Sign in | Fresno Exchange' },
   {
     path: 'account',

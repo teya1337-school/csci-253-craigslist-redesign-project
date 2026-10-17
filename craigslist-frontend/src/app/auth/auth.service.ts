@@ -27,6 +27,17 @@ export class AuthService {
     );
   }
 
+  signup(account: {
+    username: string;
+    privateEmail: string;
+    password: string;
+    confirmPassword: string;
+  }): Observable<void> {
+    return this.getCsrfToken().pipe(
+      switchMap(() => this.http.post<void>('/api/auth/signup', account)),
+    );
+  }
+
   login(credentials: LoginRequest): Observable<AuthenticatedUser> {
     return this.getCsrfToken().pipe(
       switchMap(() => this.http.post<AuthenticatedUser>('/api/auth/login', credentials)),

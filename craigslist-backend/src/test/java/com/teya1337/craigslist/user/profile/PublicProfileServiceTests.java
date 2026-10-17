@@ -42,7 +42,7 @@ class PublicProfileServiceTests {
         UUID id = UUID.randomUUID();
         when(users.findById(id)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.findProfile(id)).isInstanceOf(ResourceNotFoundException.class);
-        when(users.findById(id)).thenReturn(Optional.of(User.builder().id(id).status(UserStatus.INACTIVE).build()));
+        when(users.findById(id)).thenReturn(Optional.of(User.builder().id(id).status(UserStatus.DELETED).build()));
         assertThatThrownBy(() -> service.findProfile(id)).isInstanceOf(ResourceNotFoundException.class);
         verifyNoInteractions(posts);
     }

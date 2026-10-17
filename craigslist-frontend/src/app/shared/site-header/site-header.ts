@@ -1,3 +1,4 @@
+import { accountReturnUrl } from '../../auth/return-url';
 import { UserAvatar } from '../user-avatar';
 import { PostSearch } from '../../post/post-search/post-search';
 import { MessageService } from '../../message/message.service';
@@ -34,6 +35,17 @@ export class SiteHeader {
   protected readonly isAccountMenuOpen = signal(false);
   protected readonly isSigningOut = signal(false);
   protected readonly signOutError = signal<string | null>(null);
+
+  protected get accountReturnUrl(): string {
+    const currentUrl = this.router.url;
+    const route = this.router.parseUrl(currentUrl);
+    const path = currentUrl.split(/[?#]/)[0];
+    return accountReturnUrl(
+      path === '/login' || path === '/signup'
+        ? (route.queryParams['returnUrl'] ?? null)
+        : currentUrl,
+    );
+  }
 
   @HostListener('document:click', ['$event'])
   protected closeMenuWhenClickingOutside(event: MouseEvent): void {

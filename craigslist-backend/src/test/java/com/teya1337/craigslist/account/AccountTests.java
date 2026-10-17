@@ -1,6 +1,7 @@
 package com.teya1337.craigslist.account;
 
 import com.teya1337.craigslist.auth.security.UserPrincipal;
+import com.teya1337.craigslist.user.picture.ProfilePictureRepository;
 import com.teya1337.craigslist.user.profile.ProfileUpdateRequest;
 import com.teya1337.craigslist.auth.security.ActiveAccountFilter;
 import com.teya1337.craigslist.user.entity.UserStatus;
@@ -29,7 +30,8 @@ import static org.mockito.Mockito.*;
 class AccountTests {
     private final UserRepository userRepository = mock(UserRepository.class);
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(4);
-    private final AccountService accountService = new AccountService(userRepository, passwordEncoder);
+    private final ProfilePictureRepository pictures = mock(ProfilePictureRepository.class);
+    private final AccountService accountService = new AccountService(userRepository, passwordEncoder, pictures);
     private final User user = User.builder().id(UUID.randomUUID()).username("alice").privateEmail("alice@example.com")
             .password(passwordEncoder.encode("old-password")).build();
 
@@ -114,10 +116,18 @@ class AccountTests {
                 .isInstanceOf(ResponseStatusException.class);
         assertThat(user.getStatus()).isEqualTo(UserStatus.ACTIVE);
         verify(userRepository, never()).saveAndFlush(any());
+        verifyNoInteractions(pictures);
     }
 
     @Test void deletionDisablesLoginHidesProfileAndSignsOutCurrentSession() {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        UUID originalId = user.getId();
+        user.setBio("Personal bio");
+        user.setPrivatePhoneNumber("555-1234");
+        user.setAddress("Private address");
+        user.setPublicEmail("public@example.test");
+        user.setPublicPhoneNumber("555-5678");
+        user.setPictureVersion(UUID.randomUUID());
         UserPrincipal principal = UserPrincipal.from(user);
         MockHttpServletRequest request = new MockHttpServletRequest();
         var session = request.getSession();
@@ -125,7 +135,18 @@ class AccountTests {
                 UsernamePasswordAuthenticationToken.authenticated(principal, null, principal.getAuthorities()));
         new AccountController(accountService).delete(principal, new DeleteAccountRequest("old-password", true),
                 request, new MockHttpServletResponse());
-        assertThat(user.getStatus()).isEqualTo(UserStatus.INACTIVE);
+        assertThat(user.getStatus()).isEqualTo(UserStatus.DELETED);
+        assertThat(user.getId()).isEqualTo(originalId);
+        assertThat(user.getUsername()).isEqualTo("deleted:" + originalId);
+        assertThat(user.getPrivateEmail()).isEqualTo("deleted-" + originalId + "@deleted.invalid");
+        assertThat(user.getPassword()).isEmpty();
+        assertThat(user.getPrivatePhoneNumber()).isEmpty();
+        assertThat(user.getAddress()).isEmpty();
+        assertThat(user.getBio()).isNull();
+        assertThat(user.getPublicEmail()).isNull();
+        assertThat(user.getPublicPhoneNumber()).isNull();
+        assertThat(user.getPictureVersion()).isNull();
+        verify(pictures).deleteById(originalId);
         assertThat(user.getPublicUsername()).isEqualTo("[deleted]");
         assertThat(UserPrincipal.from(user).isEnabled()).isFalse();
         assertThatThrownBy(() -> session.getAttribute("test")).isInstanceOf(IllegalStateException.class);
@@ -138,7 +159,7 @@ class AccountTests {
 
     @Test void existingSessionsCannotKeepUsingADeletedAccount() throws Exception {
         UserPrincipal oldPrincipal = UserPrincipal.from(user);
-        user.setStatus(UserStatus.INACTIVE);
+        user.setStatus(UserStatus.DELETED);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         for (int sessionNumber = 0; sessionNumber < 2; sessionNumber++) {
             MockHttpServletRequest request = new MockHttpServletRequest();

@@ -118,6 +118,7 @@ app-post-search {
   flex-shrink: 0;
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .account-menu-container {
@@ -258,6 +259,16 @@ app-post-search {
   background: #4e2269;
 }
 
+.account-button.secondary {
+  background: #fff;
+  color: #5f2e7d;
+}
+
+.account-button.secondary:hover,
+.account-button.secondary.active {
+  background: #f2e9f7;
+}
+
 .header-alert {
   margin: 0;
   padding: 8px 16px;
@@ -303,6 +314,36 @@ app-post-search {
 }
 
 @media (max-width: 620px) {
+  .brand-copy strong {
+    font-size: 1.05rem;
+  }
+
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+  }
+
+  .account-button {
+    padding: 0 10px;
+  }
+
+  .header-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .account-actions {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  app-post-search {
+    grid-row: 3;
+  }
+
+  nav {
+    grid-row: 4;
+  }
+
   .brand-copy small {
     display: none;
   }

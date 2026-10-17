@@ -1,0 +1,119 @@
+<main class="login-page">
+  <section class="login-card" aria-labelledby="signup-heading">
+    <a class="back-link" [routerLink]="returnUrl">← Back</a>
+    <div class="heading-group">
+      <p class="eyebrow">Account</p>
+      <h1 id="signup-heading">Create account</h1>
+      <p>Join Fresno Exchange to post, comment, and send messages.</p>
+    </div>
+    @if (auth.currentUser(); as user) {
+      <p>You are already signed in as {{ user.username }}.</p>
+      <a class="back-link" [routerLink]="['/users', user.id]">View profile</a>
+    } @else {
+      <form [formGroup]="signupForm" (ngSubmit)="submit()" novalidate>
+        @if (errorMessage()) {
+          <div class="alert" role="alert">{{ errorMessage() }}</div>
+        }
+        <div class="field">
+          <label for="signup-username">Username</label>
+          <input
+            id="signup-username"
+            formControlName="username"
+            autocomplete="username"
+            autocapitalize="none"
+            spellcheck="false"
+            maxlength="100"
+            aria-describedby="signup-username-hint signup-username-error"
+            [attr.aria-invalid]="
+              signupForm.controls.username.touched && signupForm.controls.username.invalid
+            "
+          />
+          <p class="hint" id="signup-username-hint">
+            3–100 letters, numbers, or underscores. Your username is public and is used to sign in.
+          </p>
+          <div id="signup-username-error">
+            @if (signupForm.controls.username.touched && signupForm.controls.username.invalid) {
+              <p class="field-error">
+                Enter a username with 3–100 letters, numbers, or underscores.
+              </p>
+            }
+          </div>
+        </div>
+        <div class="field">
+          <label for="signup-email">Private email</label>
+          <input
+            id="signup-email"
+            type="email"
+            formControlName="privateEmail"
+            autocomplete="email"
+            maxlength="100"
+            aria-describedby="signup-email-hint signup-email-error"
+            [attr.aria-invalid]="
+              signupForm.controls.privateEmail.touched && signupForm.controls.privateEmail.invalid
+            "
+          />
+          <p class="hint" id="signup-email-hint">
+            This stays private. You can add separate public contact details to your profile later.
+          </p>
+          <div id="signup-email-error">
+            @if (
+              signupForm.controls.privateEmail.touched && signupForm.controls.privateEmail.invalid
+            ) {
+              <p class="field-error">Enter a valid email address of 100 characters or fewer.</p>
+            }
+          </div>
+        </div>
+        <div class="field">
+          <label for="signup-password">Password</label>
+          <input
+            id="signup-password"
+            type="password"
+            formControlName="password"
+            autocomplete="new-password"
+            maxlength="72"
+            aria-describedby="signup-password-hint signup-password-error"
+            [attr.aria-invalid]="
+              signupForm.controls.password.touched && signupForm.controls.password.invalid
+            "
+          />
+          <p class="hint" id="signup-password-hint">Use 3–72 characters.</p>
+          <div id="signup-password-error">
+            @if (signupForm.controls.password.touched && signupForm.controls.password.invalid) {
+              <p class="field-error">Enter a password with 3–72 characters.</p>
+            }
+          </div>
+        </div>
+        <div class="field">
+          <label for="signup-confirm">Confirm password</label>
+          <input
+            id="signup-confirm"
+            type="password"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+            maxlength="72"
+            aria-describedby="signup-confirm-error"
+            [attr.aria-invalid]="
+              signupForm.controls.confirmPassword.touched &&
+              signupForm.controls.confirmPassword.invalid
+            "
+          />
+          <div id="signup-confirm-error">
+            @if (
+              signupForm.controls.confirmPassword.touched &&
+              signupForm.controls.confirmPassword.invalid
+            ) {
+              <p class="field-error">Confirm your password.</p>
+            }
+          </div>
+        </div>
+        <button class="submit-button" type="submit" [disabled]="submitting()">
+          {{ submitting() ? 'Creating account…' : 'Create account' }}
+        </button>
+      </form>
+      <p class="auth-link">
+        Already have an account?
+        <a routerLink="/login" [queryParams]="{ returnUrl: returnUrl }">Sign in</a>
+      </p>
+    }
+  </section>
+</main>

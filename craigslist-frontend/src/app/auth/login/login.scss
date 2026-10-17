@@ -3,9 +3,7 @@
   padding: 64px 20px;
   display: grid;
   place-items: start center;
-  background:
-    radial-gradient(circle at 50% 0%, #eee2f3 0, transparent 38%),
-    #f7f6f4;
+  background: radial-gradient(circle at 50% 0%, #eee2f3 0, transparent 38%), #f7f6f4;
 }
 
 .login-card {
@@ -187,4 +185,26 @@ code {
   .login-card {
     padding: 26px 20px;
   }
+}
+
+.auth-link {
+  margin: 24px 0 0;
+  color: #514a54;
+}
+.auth-link a {
+  margin-inline-start: 4px;
+  color: #643083;
+  font-weight: 700;
+}
+.auth-link a:focus-visible {
+  outline: 3px solid #8c5dad;
+  outline-offset: 3px;
+}
+.signup-success {
+  padding: 14px;
+  margin-bottom: 22px;
+  border-radius: 8px;
+  color: #255b35;
+  background: #edf7ef;
+  line-height: 1.5;
 }

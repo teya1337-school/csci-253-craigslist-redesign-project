@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 "/api/auth/login",
+                                "/api/auth/signup",
                                 "/api/auth/csrf",
                                 "/actuator/health"
                         ).permitAll()

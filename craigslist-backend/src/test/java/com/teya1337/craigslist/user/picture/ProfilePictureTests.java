@@ -69,8 +69,8 @@ class ProfilePictureTests {
         verify(pictures).delete(picture);
     }
 
-    @Test void inactiveUsersPicturesAreNotPublicAndCannotBeChanged() {
-        user.setStatus(UserStatus.INACTIVE);
+    @Test void deletedUsersPicturesAreNotPublicAndCannotBeChanged() {
+        user.setStatus(UserStatus.DELETED);
         when(users.findById(user.getId())).thenReturn(Optional.of(user));
         assertThatThrownBy(() -> service.find(user.getId())).isInstanceOf(ResponseStatusException.class);
         assertThatThrownBy(() -> service.remove(user.getId(), "test-password")).isInstanceOf(ResponseStatusException.class);

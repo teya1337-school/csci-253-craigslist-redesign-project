@@ -115,7 +115,20 @@
           }
         </div>
       } @else {
-        <a class="account-button" routerLink="/login" routerLinkActive="active">Sign in</a>
+        <a
+          class="account-button"
+          routerLink="/signup"
+          [queryParams]="{ returnUrl: accountReturnUrl }"
+          routerLinkActive="active"
+          >Sign up</a
+        >
+        <a
+          class="account-button secondary"
+          routerLink="/login"
+          [queryParams]="{ returnUrl: accountReturnUrl }"
+          routerLinkActive="active"
+          >Sign in</a
+        >
       }
     </div>
   </div>

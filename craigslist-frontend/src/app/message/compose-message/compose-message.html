@@ -1,0 +1,73 @@
+<main class="create-post-page">
+  <div class="page-shell">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a routerLink="/inbox">Inbox</a><span aria-hidden="true">/</span
+      ><span aria-current="page">{{ replyTo() ? 'Reply' : 'New message' }}</span>
+    </nav>
+    <section class="form-card" aria-labelledby="compose-heading">
+      @if (isLoading()) {
+        <p role="status">Loading recipient…</p>
+      } @else if (loadError()) {
+        <h1 id="compose-heading">Message unavailable</h1>
+        <p class="alert" role="alert">{{ loadError() }}</p>
+        <button type="button" class="cancel-button" (click)="retry()">Try again</button>
+        <a routerLink="/inbox">Back to Inbox</a>
+      } @else if (recipient(); as user) {
+        <header class="heading-group">
+          <p class="eyebrow">Private message</p>
+          <h1 id="compose-heading">
+            {{ replyTo() ? 'Reply to ' + user.username : 'Message ' + user.username }}
+          </h1>
+          <p>To <app-user-link [userId]="user.id" [username]="user.username" /></p>
+        </header>
+        <form [formGroup]="form" (ngSubmit)="send()" novalidate>
+          @if (sendError()) {
+            <div class="alert" role="alert">{{ sendError() }}</div>
+          }
+          <div class="field">
+            <label for="message-subject">Subject</label
+            ><input
+              id="message-subject"
+              formControlName="subject"
+              maxlength="200"
+              autocomplete="off"
+              [attr.aria-invalid]="form.controls.subject.invalid && form.controls.subject.touched"
+              aria-describedby="subject-error"
+            />
+            @if (form.controls.subject.invalid && form.controls.subject.touched) {
+              <p id="subject-error" class="field-error">
+                Enter a subject of 200 characters or fewer.
+              </p>
+            }
+          </div>
+          <div class="field">
+            <div class="label-row">
+              <label for="message-body">Message</label
+              ><span>{{ form.controls.body.value.length }}/5000</span>
+            </div>
+            <textarea
+              id="message-body"
+              formControlName="body"
+              rows="8"
+              maxlength="5000"
+              [attr.aria-invalid]="form.controls.body.invalid && form.controls.body.touched"
+              aria-describedby="body-error"
+            ></textarea>
+            @if (form.controls.body.invalid && form.controls.body.touched) {
+              <p id="body-error" class="field-error">
+                Enter a message of 5000 characters or fewer.
+              </p>
+            }
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-button" (click)="cancel()" [disabled]="isSending()">
+              Cancel</button
+            ><button class="submit-button" type="submit" [disabled]="isSending()">
+              {{ isSending() ? 'Sending…' : 'Send message' }}
+            </button>
+          </div>
+        </form>
+      }
+    </section>
+  </div>
+</main>

@@ -1,3 +1,6 @@
+import { Inbox } from './message/inbox/inbox';
+import { MessageDetail } from './message/message-detail/message-detail';
+import { ComposeMessage } from './message/compose-message/compose-message';
 import { UserProfile } from './user/user-profile/user-profile';
 import { MyPosts } from './post/my-posts/my-posts';
 import { Routes } from '@angular/router';
@@ -49,6 +52,32 @@ export const routes: Routes = [
     title: 'My Posts | Fresno Exchange',
   },
   { path: 'users/:userId', component: UserProfile, title: 'User profile | Fresno Exchange' },
+  {
+    path: 'inbox',
+    component: Inbox,
+    canActivate: [authGuard],
+    title: 'Messages | Fresno Exchange',
+  },
+  {
+    path: 'inbox/received/:messageId',
+    component: MessageDetail,
+    canActivate: [authGuard],
+    data: { mailbox: 'INBOX' },
+    title: 'Message | Fresno Exchange',
+  },
+  {
+    path: 'inbox/sent/:messageId',
+    component: MessageDetail,
+    canActivate: [authGuard],
+    data: { mailbox: 'SENT' },
+    title: 'Sent message | Fresno Exchange',
+  },
+  {
+    path: 'messages/new',
+    component: ComposeMessage,
+    canActivate: [authGuard],
+    title: 'New message | Fresno Exchange',
+  },
   { path: 'login', component: Login, title: 'Sign in | Fresno Exchange' },
   {
     path: 'account',

@@ -21,6 +21,25 @@
         <a routerLink="/my-posts" routerLinkActive="active" ariaCurrentWhenActive="page"
           >My Posts</a
         >
+        <a
+          routerLink="/inbox"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          [attr.aria-label]="
+            messageService.unreadCount()
+              ? 'Inbox, ' +
+                messageService.unreadCount() +
+                (messageService.unreadCount() === 1 ? ' unread message' : ' unread messages')
+              : 'Inbox'
+          "
+        >
+          Inbox
+          @if (messageService.unreadCount() > 0) {
+            <span class="unread-badge" aria-hidden="true">{{
+              messageService.unreadCount() > 99 ? '99+' : messageService.unreadCount()
+            }}</span>
+          }
+        </a>
       }
     </nav>
 

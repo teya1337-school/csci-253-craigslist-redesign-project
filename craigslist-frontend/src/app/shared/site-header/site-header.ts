@@ -1,3 +1,4 @@
+import { MessageService } from '../../message/message.service';
 import {
   Component,
   ElementRef,
@@ -26,6 +27,7 @@ export class SiteHeader {
   @ViewChildren('menuItem', { read: ElementRef })
   private menuItems?: QueryList<ElementRef<HTMLElement>>;
 
+  protected readonly messageService = inject(MessageService);
   protected readonly authService = inject(AuthService);
   protected readonly isAccountMenuOpen = signal(false);
   protected readonly isSigningOut = signal(false);

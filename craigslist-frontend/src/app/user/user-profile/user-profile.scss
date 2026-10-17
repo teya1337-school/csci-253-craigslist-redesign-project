@@ -4,3 +4,48 @@
 .empty-state p {
   line-height: 1.5;
 }
+
+.profile-identity {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px 22px;
+}
+.profile-identity h1 {
+  min-width: 0;
+}
+.message-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  min-height: 42px;
+  padding: 8px 14px;
+  box-sizing: border-box;
+  border: 1px solid #c9b6d5;
+  border-radius: 8px;
+  background: #fff;
+  color: #642f83;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.message-user svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.message-user:hover {
+  background: #f5eff8;
+  border-color: #70418c;
+}
+.message-user:focus-visible {
+  outline: 3px solid #8c5dad;
+  outline-offset: 3px;
+}

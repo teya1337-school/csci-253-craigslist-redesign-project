@@ -16,7 +16,18 @@
       <header class="page-heading">
         <div>
           <p class="eyebrow">User profile</p>
-          <h1>{{ user.username }}</h1>
+          <div class="profile-identity">
+            <h1>{{ user.username }}</h1>
+            @if (authService.currentUser()?.id !== user.id) {
+              <a class="message-user" routerLink="/messages/new" [queryParams]="{ to: user.id }">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="3" y="5" width="18" height="14" rx="2" />
+                  <path d="m3 6 9 7 9-7" />
+                </svg>
+                <span>Message {{ user.username }}</span>
+              </a>
+            }
+          </div>
           <p>
             Member since
             <time [attr.datetime]="user.memberSince">{{

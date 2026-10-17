@@ -17,8 +17,8 @@ import { PostService } from '../../post/post.service';
 export class General implements OnInit {
   private readonly postService = inject(PostService);
   private readonly route = inject(ActivatedRoute);
-
   protected readonly authService = inject(AuthService);
+
   protected readonly posts = signal<PostResponse[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly errorMessage = signal<string | null>(null);

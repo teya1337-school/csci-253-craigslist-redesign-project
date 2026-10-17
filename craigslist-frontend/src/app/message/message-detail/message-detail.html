@@ -1,0 +1,89 @@
+<main class="mail-page">
+  <div class="page-shell">
+    <nav class="breadcrumbs" aria-label="Message navigation">
+      <a routerLink="/inbox" [queryParams]="{ folder: mailbox === 'SENT' ? 'sent' : null }">
+        <span aria-hidden="true">← </span
+        >{{ mailbox === 'SENT' ? 'Back to Sent' : 'Back to Inbox' }}
+      </a>
+    </nav>
+    @if (isLoading()) {
+      <div class="state" role="status">Loading message…</div>
+    } @else if (error()) {
+      <section class="state panel" role="alert">
+        <h1>Message unavailable</h1>
+        <p class="error">{{ error() }}</p>
+        <button type="button" (click)="retry()">Try again</button>
+      </section>
+    } @else if (message(); as item) {
+      <article class="panel detail">
+        <p class="eyebrow">{{ mailbox === 'INBOX' ? 'Received message' : 'Sent message' }}</p>
+        <h1>{{ item.subject }}</h1>
+        <div class="metadata">
+          <div>
+            From <app-user-link [userId]="item.senderId" [username]="item.senderUsername" />
+          </div>
+          <div>
+            To <app-user-link [userId]="item.recipientId" [username]="item.recipientUsername" />
+          </div>
+          <time [attr.datetime]="item.sentAt">{{ item.sentAt | date: 'medium' }}</time>
+        </div>
+        <div class="message-body">{{ item.body }}</div>
+        <div class="actions">
+          <a
+            class="button back-to-mailbox"
+            routerLink="/inbox"
+            [queryParams]="{ folder: mailbox === 'SENT' ? 'sent' : null }"
+          >
+            <span aria-hidden="true">←&nbsp;</span
+            >{{ mailbox === 'SENT' ? 'Back to Sent' : 'Back to Inbox' }}
+          </a>
+          <button
+            class="danger delete-trigger"
+            type="button"
+            (click)="confirmDelete()"
+            [disabled]="isDeleting()"
+          >
+            Delete message
+          </button>
+          @if (mailbox === 'INBOX') {
+            <a
+              class="button primary"
+              routerLink="/messages/new"
+              [queryParams]="{ replyTo: item.id }"
+              >Reply</a
+            >
+          }
+        </div>
+        @if (confirmingDelete()) {
+          <section class="delete-confirmation" aria-labelledby="delete-message-heading">
+            <h2 id="delete-message-heading">Delete this message?</h2>
+            <p>
+              This removes it from your {{ mailbox === 'INBOX' ? 'inbox' : 'sent messages' }} only.
+              The other person’s copy stays available.
+            </p>
+            @if (deleteError()) {
+              <p class="error" role="alert">{{ deleteError() }}</p>
+            }
+            <div class="actions">
+              <button
+                class="cancel-delete"
+                type="button"
+                (click)="cancelDelete()"
+                [disabled]="isDeleting()"
+              >
+                Cancel</button
+              ><button
+                class="confirm-delete"
+                type="button"
+                (click)="deleteMessage()"
+                [disabled]="isDeleting()"
+              >
+                {{ isDeleting() ? 'Deleting…' : 'Delete message' }}
+              </button>
+            </div>
+          </section>
+        }
+      </article>
+    }
+  </div>
+</main>

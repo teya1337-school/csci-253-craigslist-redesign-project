@@ -1,3 +1,4 @@
+import { AuthService } from '../../auth/auth.service';
 import { DatePipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
@@ -22,6 +23,7 @@ interface PublicProfile {
   styleUrls: ['../../community/general/general.scss', './user-profile.scss'],
 })
 export class UserProfile implements OnInit {
+  protected readonly authService = inject(AuthService);
   private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);
   private readonly title = inject(Title);

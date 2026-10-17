@@ -1,0 +1,77 @@
+<main class="mail-page">
+  <div class="page-shell">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a routerLink="/">Home</a><span aria-hidden="true">/</span
+      ><span aria-current="page">Messages</span>
+    </nav>
+    <p class="eyebrow">Private messages</p>
+    <h1>Messages</h1>
+    <p class="subtitle">Read and manage your private messages.</p>
+    <nav class="mail-tabs" aria-label="Message folders">
+      <a
+        routerLink="/inbox"
+        [class.active]="mailbox() === 'INBOX'"
+        [attr.aria-current]="mailbox() === 'INBOX' ? 'page' : null"
+        >Inbox</a
+      >
+      <a
+        routerLink="/inbox"
+        [queryParams]="{ folder: 'sent' }"
+        [class.active]="mailbox() === 'SENT'"
+        [attr.aria-current]="mailbox() === 'SENT' ? 'page' : null"
+        >Sent</a
+      >
+    </nav>
+    <p class="notice" role="status">{{ notice() }}</p>
+    <section class="panel" aria-labelledby="mailbox-heading">
+      <div class="panel-heading">
+        <h2 id="mailbox-heading">{{ mailbox() === 'INBOX' ? 'Inbox' : 'Sent messages' }}</h2>
+        <span>Newest first</span>
+      </div>
+      @if (isLoading()) {
+        <div class="state" role="status">Loading messages…</div>
+      } @else if (error()) {
+        <div class="state" role="alert">
+          <p class="error">{{ error() }}</p>
+          <button type="button" (click)="refresh()">Try again</button>
+          <a routerLink="/login" [queryParams]="{ returnUrl: '/inbox' }">Sign in</a>
+        </div>
+      } @else if (messages().length === 0) {
+        <div class="state">
+          <h2>{{ mailbox() === 'INBOX' ? 'No messages yet' : 'No sent messages yet' }}</h2>
+          <p>
+            {{
+              mailbox() === 'INBOX'
+                ? 'Messages you receive will appear here.'
+                : 'To send a message, visit a user’s profile and choose Message.'
+            }}
+          </p>
+        </div>
+      } @else {
+        @for (message of messages(); track message.id) {
+          <a
+            class="message-row"
+            [class.unread]="mailbox() === 'INBOX' && !message.readAt"
+            [routerLink]="['/inbox', mailbox() === 'INBOX' ? 'received' : 'sent', message.id]"
+          >
+            <span class="correspondent">{{
+              mailbox() === 'INBOX' ? message.senderUsername : message.recipientUsername
+            }}</span>
+            <span class="message-summary"
+              ><span class="subject">{{ message.subject }}</span>
+              @if (mailbox() === 'INBOX' && !message.readAt) {
+                <span class="unread-label">Unread</span>
+              }
+            </span>
+            <time [attr.datetime]="message.sentAt">{{
+              message.sentAt | date: 'MMM d, h:mm a'
+            }}</time>
+          </a>
+        }
+      }
+    </section>
+    @if (!isLoading() && !error()) {
+      <p><button type="button" (click)="refresh()">Refresh messages</button></p>
+    }
+  </div>
+</main>

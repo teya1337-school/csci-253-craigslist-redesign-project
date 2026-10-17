@@ -4,6 +4,10 @@ import com.teya1337.craigslist.common.error.ForbiddenOperationException;
 import com.teya1337.craigslist.common.error.ResourceNotFoundException;
 import com.teya1337.craigslist.post.dto.PostRequest;
 import com.teya1337.craigslist.post.dto.PostResponse;
+import com.teya1337.craigslist.post.dto.PostSearchResponse;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import com.teya1337.craigslist.post.entity.Post;
 import com.teya1337.craigslist.post.entity.PostCategory;
 import com.teya1337.craigslist.post.entity.PostStatus;
@@ -26,6 +30,22 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+
+    @Transactional(readOnly = true)
+    public PostSearchResponse searchPosts(String query) {
+        String normalized = query.strip();
+        if (normalized.length() > 200) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Use 200 characters or fewer for search.");
+        }
+        if (normalized.length() < 2) {
+            return new PostSearchResponse(List.of(), 0);
+        }
+        var results = postRepository.searchPublishedPosts(normalized, PostStatus.PUBLISHED,
+                PageRequest.of(0, 50));
+        return new PostSearchResponse(
+                results.getContent().stream().map(this::toResponse).toList(), results.getTotalElements());
+    }
 
     @Transactional(readOnly = true)
     public List<PostResponse> findPublishedPosts(PostCategory category, PostType postType) {

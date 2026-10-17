@@ -1,0 +1,105 @@
+<section aria-label="Search public posts" (focusout)="handleFocusOut($event)">
+  <div class="search-anchor">
+    <div class="search-box" role="search">
+      <label for="site-search" class="visually-hidden">Search posts</label>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="6.5" />
+        <path d="m15.5 15.5 5 5" />
+      </svg>
+      <input
+        #searchInput
+        id="site-search"
+        type="search"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-haspopup="listbox"
+        [attr.aria-expanded]="dropdownVisible()"
+        aria-controls="search-suggestions"
+        [attr.aria-activedescendant]="
+          dropdownVisible() && activeIndex() >= 0 ? 'search-option-' + activeIndex() : null
+        "
+        [formControl]="search"
+        maxlength="200"
+        autocomplete="off"
+        placeholder="Search posts"
+        aria-describedby="search-hint"
+        (focus)="open()"
+        (click)="open()"
+        (keydown)="handleKeydown($event)"
+      />
+      @if (search.value) {
+        <button class="clear-search" type="button" (click)="clear()">Clear</button>
+      }
+    </div>
+    @if (dropdownVisible()) {
+      <div class="search-dropdown">
+        @if (state().status === 'waiting' || state().status === 'loading') {
+          <p class="dropdown-feedback">Searching posts…</p>
+        } @else if (state().status === 'error') {
+          <div class="dropdown-feedback">
+            <p>We could not search posts.</p>
+            <button class="retry-search" type="button" (click)="retrySearch()">Try again</button>
+          </div>
+        } @else if (state().status === 'success' && suggestions().length === 0) {
+          <div class="dropdown-feedback">
+            <strong>No matching posts</strong>
+            <p>Try another word or a shorter phrase.</p>
+          </div>
+        }
+        <div id="search-suggestions" role="listbox" aria-label="Post suggestions">
+          @for (post of suggestions(); track post.id; let index = $index) {
+            <div
+              class="suggestion"
+              role="option"
+              [id]="'search-option-' + index"
+              [attr.aria-selected]="activeIndex() === index"
+              [class.active]="activeIndex() === index"
+              (mouseenter)="activeIndex.set(index)"
+              (mousedown)="$event.preventDefault()"
+              (click)="choose(post)"
+            >
+              <span class="suggestion-title">{{ post.title }}</span>
+              <span class="suggestion-meta"
+                >{{ post.username }} · {{ post.createdAt | date: 'mediumDate' }}
+                @if (post.location) {
+                  · {{ post.location }}
+                }
+              </span>
+            </div>
+          }
+        </div>
+        @if (state().status === 'success' && suggestions().length > 0) {
+          <p class="dropdown-summary">
+            {{ state().total }} {{ state().total === 1 ? 'matching post' : 'matching posts' }} ·
+            Newest first
+            @if (state().total > suggestions().length) {
+              <br />Showing {{ suggestions().length }} suggestions. Refine your search for more
+              specific results.
+            }
+          </p>
+        }
+      </div>
+    }
+  </div>
+  <span class="visually-hidden" id="search-hint"
+    >Search post titles and content. Type at least 2 characters.</span
+  >
+  <p class="visually-hidden" role="status" aria-atomic="true">
+    @if (dropdownVisible()) {
+      @switch (state().status) {
+        @case ('loading') {
+          Searching posts…
+        }
+        @case ('success') {
+          {{ state().total }} {{ state().total === 1 ? 'post found' : 'posts found' }}.
+          @if (suggestions().length > 0) {
+            Use the up and down arrow keys to choose a post, then Enter to open it.
+          }
+        }
+        @case ('error') {
+          We could not search posts. Please try again.
+        }
+      }
+    }
+  </p>
+</section>

@@ -3,6 +3,7 @@ package com.teya1337.craigslist.post;
 import com.teya1337.craigslist.auth.security.UserPrincipal;
 import com.teya1337.craigslist.post.dto.PostRequest;
 import com.teya1337.craigslist.post.dto.PostResponse;
+import com.teya1337.craigslist.post.dto.PostSearchResponse;
 import com.teya1337.craigslist.post.entity.PostCategory;
 import com.teya1337.craigslist.post.entity.PostType;
 import jakarta.validation.Valid;
@@ -36,6 +37,11 @@ public class PostController {
             @RequestParam(required = false) PostType postType
     ) {
         return postService.findPublishedPosts(category, postType);
+    }
+
+    @GetMapping("/search")
+    public PostSearchResponse searchPosts(@RequestParam(name = "search", defaultValue = "") String search) {
+        return postService.searchPosts(search);
     }
 
     @GetMapping("/mine")

@@ -5,6 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
   computed,
+  DestroyRef,
   ElementRef,
   HostListener,
   inject,
@@ -13,7 +14,8 @@ import {
   ViewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../auth/auth.service';
 import { PostComments } from '../../comment/post-comments/post-comments';
 import { PostResponse } from '../models/post-response';
@@ -27,6 +29,8 @@ import { PostService } from '../post.service';
 })
 export class PostDetail implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
+  private postRequest?: Subscription;
   private readonly router = inject(Router);
   private readonly postService = inject(PostService);
 
@@ -64,11 +68,18 @@ export class PostDetail implements OnInit {
   }
 
   ngOnInit(): void {
-    this.wasUpdated.set(this.route.snapshot.queryParamMap.get('updated') === 'true');
-    this.loadPost();
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.wasUpdated.set(this.route.snapshot.queryParamMap.get('updated') === 'true');
+      this.isPostMenuOpen.set(false);
+      this.isConfirmingDelete.set(false);
+      this.deleteError.set(null);
+      this.loadPost();
+    });
   }
 
   protected loadPost(): void {
+    this.postRequest?.unsubscribe();
+    this.post.set(null);
     const postId = this.route.snapshot.paramMap.get('postId');
 
     if (!postId) {
@@ -80,9 +91,12 @@ export class PostDetail implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.postService
+    this.postRequest = this.postService
       .getPost(postId)
-      .pipe(finalize(() => this.isLoading.set(false)))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isLoading.set(false)),
+      )
       .subscribe({
         next: (post) => this.post.set(post),
         error: (error: HttpErrorResponse) => {

@@ -17,7 +17,7 @@
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 20px;
 }
 
 .brand {
@@ -109,8 +109,13 @@ nav a.active {
   color: #542474;
 }
 
+app-post-search {
+  flex: 1;
+  min-width: 0;
+}
+
 .account-actions {
-  margin-left: auto;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
 }
@@ -264,12 +269,27 @@ nav a.active {
 @media (max-width: 900px) {
   .header-shell {
     padding: 12px 0;
-    flex-wrap: wrap;
-    gap: 12px 20px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 14px;
+  }
+
+  .brand {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .account-actions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  app-post-search {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
 
   nav {
-    order: 3;
+    grid-column: 1 / -1;
+    grid-row: 3;
     width: 100%;
     min-height: 46px;
     overflow-x: auto;

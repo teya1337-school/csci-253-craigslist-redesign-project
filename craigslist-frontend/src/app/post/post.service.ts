@@ -13,6 +13,12 @@ export class PostService {
     return this.http.get<PostResponse[]>('/api/posts', { params });
   }
 
+  searchPosts(search: string): Observable<{ posts: PostResponse[]; total: number }> {
+    return this.http.get<{ posts: PostResponse[]; total: number }>('/api/posts/search', {
+      params: { search },
+    });
+  }
+
   getMyPosts(): Observable<PostResponse[]> {
     return this.http.get<PostResponse[]>('/api/posts/mine');
   }

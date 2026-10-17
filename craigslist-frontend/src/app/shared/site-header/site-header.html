@@ -58,10 +58,7 @@
             [attr.aria-label]="'Open account menu for ' + user.username"
             (click)="toggleAccountMenu()"
           >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="12" cy="8" r="4"></circle>
-              <path d="M4.5 20c.6-4.1 3.2-6.2 7.5-6.2s6.9 2.1 7.5 6.2"></path>
-            </svg>
+            <app-user-avatar [userId]="user.id" [version]="user.pictureVersion" />
             <span class="status-dot" aria-hidden="true"></span>
           </button>
 
@@ -78,12 +75,27 @@
                 <strong>{{ user.username }}</strong>
               </div>
 
-              <a #menuItem role="menuitem" routerLink="/account" (click)="closeAccountMenu()">
+              <a
+                #menuItem
+                role="menuitem"
+                [routerLink]="['/users', user.id]"
+                (click)="closeAccountMenu()"
+              >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <circle cx="12" cy="8" r="3.5"></circle>
                   <path d="M5 20c.6-3.8 3-5.7 7-5.7s6.4 1.9 7 5.7"></path>
                 </svg>
-                Account
+                View profile
+              </a>
+
+              <a #menuItem role="menuitem" routerLink="/account" (click)="closeAccountMenu()">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 6h16M4 12h16M4 18h16"></path>
+                  <circle cx="9" cy="6" r="2"></circle>
+                  <circle cx="15" cy="12" r="2"></circle>
+                  <circle cx="9" cy="18" r="2"></circle>
+                </svg>
+                Account settings
               </a>
 
               <button

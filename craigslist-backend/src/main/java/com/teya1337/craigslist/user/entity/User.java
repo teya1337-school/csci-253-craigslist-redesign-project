@@ -32,8 +32,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = 100)
-    private String email;
+    @Column(name = "private_email", nullable = false, unique = true, length = 100)
+    private String privateEmail;
 
     @Column(nullable = false, unique = true, length = 100)
     private String username;
@@ -41,8 +41,8 @@ public class User {
     @Column(nullable = false, length = 100)
     private String password;
 
-    @Column(name = "phone_number", nullable = false, length = 20)
-    private String phoneNumber;
+    @Column(name = "private_phone_number", nullable = false, length = 20)
+    private String privatePhoneNumber;
 
     @Column(nullable = false, length = 255)
     private String address;
@@ -61,6 +61,18 @@ public class User {
     public String getPublicUsername() {
         return status == UserStatus.ACTIVE ? username : "[deleted]";
     }
+
+    @Column(length = 1000)
+    private String bio;
+
+    @Column(name = "public_email", length = 100)
+    private String publicEmail;
+
+    @Column(name = "public_phone_number", length = 30)
+    private String publicPhoneNumber;
+
+    @Column(name = "picture_version")
+    private UUID pictureVersion;
 
     @PrePersist
     private void onCreate() {

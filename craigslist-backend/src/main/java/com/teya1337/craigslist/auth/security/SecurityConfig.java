@@ -43,7 +43,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/posts/mine").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/posts", "/api/posts/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users/*/profile").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/*/profile", "/api/users/*/picture").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

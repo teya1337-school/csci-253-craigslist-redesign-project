@@ -31,20 +31,22 @@ public class UserPrincipal implements UserDetails, CredentialsContainer {
     public static UserPrincipal from(User user) {
         return UserPrincipal.builder()
                 .userId(user.getId())
-                .email(user.getEmail())
+                .pictureVersion(user.getPictureVersion())
+                .privateEmail(user.getPrivateEmail())
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .phoneNumber(user.getPhoneNumber())
+                .privatePhoneNumber(user.getPrivatePhoneNumber())
                 .address(user.getAddress())
                 .status(user.getStatus())
                 .build();
     }
 
     private final UUID userId;
-    private final String email;
+    private final UUID pictureVersion;
+    private final String privateEmail;
     private final String username;
     private String password;
-    private final String phoneNumber;
+    private final String privatePhoneNumber;
     private final String address;
     private final UserStatus status;
 

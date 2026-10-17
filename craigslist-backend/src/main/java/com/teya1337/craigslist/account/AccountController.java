@@ -1,6 +1,7 @@
 package com.teya1337.craigslist.account;
 
 import com.teya1337.craigslist.auth.security.UserPrincipal;
+import com.teya1337.craigslist.user.profile.ProfileUpdateRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -51,6 +52,12 @@ public class AccountController {
                        HttpServletRequest request, HttpServletResponse response) {
         accountService.deleteAccount(principal.getUserId(), account);
         new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+    }
+
+    @PutMapping(value = "/profile", consumes = "application/json")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateProfile(@AuthenticationPrincipal UserPrincipal principal, @Valid @RequestBody ProfileUpdateRequest profile) {
+        accountService.updateProfile(principal.getUserId(), profile);
     }
 
     private void refreshSession(UserPrincipal principal, HttpServletRequest request, HttpServletResponse response) {

@@ -1,8 +1,9 @@
 export interface AuthenticatedUser {
   id: string;
-  email: string;
+  pictureVersion: string | null;
+  privateEmail: string;
   username: string;
-  phoneNumber: string;
+  privatePhoneNumber: string;
   address: string;
   status: 'ACTIVE' | 'INACTIVE';
 }

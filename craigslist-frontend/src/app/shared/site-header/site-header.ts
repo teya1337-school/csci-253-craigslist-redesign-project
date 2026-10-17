@@ -1,3 +1,4 @@
+import { UserAvatar } from '../user-avatar';
 import { PostSearch } from '../../post/post-search/post-search';
 import { MessageService } from '../../message/message.service';
 import {
@@ -16,7 +17,7 @@ import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-site-header',
-  imports: [RouterLink, RouterLinkActive, PostSearch],
+  imports: [RouterLink, RouterLinkActive, PostSearch, UserAvatar],
   templateUrl: './site-header.html',
   styleUrl: './site-header.scss',
 })

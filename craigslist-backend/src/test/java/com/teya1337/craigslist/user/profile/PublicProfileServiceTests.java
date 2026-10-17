@@ -23,15 +23,19 @@ class PublicProfileServiceTests {
         UUID id = UUID.randomUUID();
         Instant joined = Instant.parse("2026-10-01T00:00:00Z");
         when(users.findById(id)).thenReturn(Optional.of(User.builder().id(id).username("alice")
-                .createdAt(joined).email("private@example.test").phoneNumber("private phone")
+                .createdAt(joined).privateEmail("private@example.test").privatePhoneNumber("private phone")
+                .bio("About Alice").publicEmail("public@example.test").publicPhoneNumber("555-123-4567")
                 .address("private address").password("private password").build()));
         when(posts.findPublishedPostsByUserId(id)).thenReturn(List.of());
         var result = service.findProfile(id);
         assertThat(result.username()).isEqualTo("alice");
         assertThat(result.memberSince()).isEqualTo(joined);
         assertThat(result.posts()).isEmpty();
+        assertThat(result.bio()).isEqualTo("About Alice");
+        assertThat(result.publicEmail()).isEqualTo("public@example.test");
+        assertThat(result.publicPhoneNumber()).isEqualTo("555-123-4567");
         assertThat(Arrays.stream(PublicProfileResponse.class.getRecordComponents()).map(c -> c.getName()))
-                .containsExactly("id", "username", "memberSince", "posts");
+                .containsExactly("id", "username", "memberSince", "bio", "publicEmail", "publicPhoneNumber", "pictureVersion", "posts");
     }
 
     @Test void unknownAndInactiveProfilesAreUnavailable() {

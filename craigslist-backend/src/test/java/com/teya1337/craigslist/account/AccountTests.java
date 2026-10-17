@@ -1,6 +1,7 @@
 package com.teya1337.craigslist.account;
 
 import com.teya1337.craigslist.auth.security.UserPrincipal;
+import com.teya1337.craigslist.user.profile.ProfileUpdateRequest;
 import com.teya1337.craigslist.auth.security.ActiveAccountFilter;
 import com.teya1337.craigslist.user.entity.UserStatus;
 import com.teya1337.craigslist.user.profile.PublicProfileService;
@@ -29,7 +30,7 @@ class AccountTests {
     private final UserRepository userRepository = mock(UserRepository.class);
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(4);
     private final AccountService accountService = new AccountService(userRepository, passwordEncoder);
-    private final User user = User.builder().id(UUID.randomUUID()).username("alice").email("alice@example.com")
+    private final User user = User.builder().id(UUID.randomUUID()).username("alice").privateEmail("alice@example.com")
             .password(passwordEncoder.encode("old-password")).build();
 
     @AfterEach void clearContext() { SecurityContextHolder.clearContext(); }
@@ -39,7 +40,7 @@ class AccountTests {
         UserPrincipal principal = accountService.updateAccount(user.getId(), new AccountRequest("new_alice", "new@example.com", "old-password"));
         assertThat(principal.getUserId()).isEqualTo(user.getId());
         assertThat(principal.getUsername()).isEqualTo("new_alice");
-        assertThat(principal.getEmail()).isEqualTo("new@example.com");
+        assertThat(principal.getPrivateEmail()).isEqualTo("new@example.com");
         assertThat(principal.getPassword()).isNull();
         verify(userRepository).saveAndFlush(user);
     }
@@ -52,9 +53,9 @@ class AccountTests {
                     .isInstanceOf(ResponseStatusException.class);
         }
         assertThat(user.getUsername()).isEqualTo("alice");
-        assertThat(user.getEmail()).isEqualTo("alice@example.com");
+        assertThat(user.getPrivateEmail()).isEqualTo("alice@example.com");
         verify(userRepository, never()).existsByUsernameIgnoreCaseAndIdNot(any(), any());
-        verify(userRepository, never()).existsByEmailIgnoreCaseAndIdNot(any(), any());
+        verify(userRepository, never()).existsByPrivateEmailIgnoreCaseAndIdNot(any(), any());
         verify(userRepository, never()).saveAndFlush(any());
     }
 
@@ -63,7 +64,7 @@ class AccountTests {
         when(userRepository.existsByUsernameIgnoreCaseAndIdNot("bob", user.getId())).thenReturn(true);
         assertThatThrownBy(() -> accountService.updateAccount(user.getId(), new AccountRequest("bob", "alice@example.com", "old-password")))
                 .isInstanceOf(ResponseStatusException.class);
-        when(userRepository.existsByEmailIgnoreCaseAndIdNot("bob@example.com", user.getId())).thenReturn(true);
+        when(userRepository.existsByPrivateEmailIgnoreCaseAndIdNot("bob@example.com", user.getId())).thenReturn(true);
         assertThatThrownBy(() -> accountService.updateAccount(user.getId(), new AccountRequest("alice", "bob@example.com", "old-password")))
                 .isInstanceOf(ResponseStatusException.class);
         verify(userRepository, never()).saveAndFlush(any());
@@ -148,6 +149,25 @@ class AccountTests {
             assertThatThrownBy(() -> session.getAttribute("test")).isInstanceOf(IllegalStateException.class);
             assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
         }
+    }
+
+    @Test void profileChangesRequirePasswordAndNeverOverwritePrivateInformationOrUsername() {
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        assertThatThrownBy(() -> accountService.updateProfile(user.getId(),
+                new ProfileUpdateRequest("bio", "public@example.com", "555-1234", "wrong")))
+                .isInstanceOf(ResponseStatusException.class);
+        assertThat(user.getBio()).isNull();
+        verify(userRepository, never()).saveAndFlush(any());
+        accountService.updateProfile(user.getId(), new ProfileUpdateRequest(" About me ", "public@example.com", "555-1234", "old-password"));
+        assertThat(user.getBio()).isEqualTo("About me");
+        assertThat(user.getPublicEmail()).isEqualTo("public@example.com");
+        assertThat(user.getPublicPhoneNumber()).isEqualTo("555-1234");
+        assertThat(user.getPrivateEmail()).isEqualTo("alice@example.com");
+        assertThat(user.getUsername()).isEqualTo("alice");
+        accountService.updateProfile(user.getId(), new ProfileUpdateRequest("", "", "", "old-password"));
+        assertThat(user.getBio()).isNull();
+        assertThat(user.getPublicEmail()).isNull();
+        assertThat(user.getPublicPhoneNumber()).isNull();
     }
 
 }

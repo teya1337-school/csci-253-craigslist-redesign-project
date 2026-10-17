@@ -5,4 +5,4 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record PublicProfileResponse(UUID id, String username, Instant memberSince, List<PostResponse> posts) {}
+public record PublicProfileResponse(UUID id, String username, Instant memberSince, String bio, String publicEmail, String publicPhoneNumber, UUID pictureVersion, List<PostResponse> posts) {}

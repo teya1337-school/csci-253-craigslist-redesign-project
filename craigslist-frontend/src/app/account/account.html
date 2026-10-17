@@ -3,7 +3,7 @@
     <a class="back-link" routerLink="/">← Back to home</a>
     <div class="heading-group">
       <p class="eyebrow">Your account</p>
-      <h1 id="account-heading">Account</h1>
+      <h1 id="account-heading">Account settings</h1>
       <p>Manage your information and password.</p>
     </div>
 
@@ -16,7 +16,7 @@
         </div>
         <div>
           <dt>Email</dt>
-          <dd>{{ authService.currentUser()?.email }}</dd>
+          <dd>{{ authService.currentUser()?.privateEmail }}</dd>
         </div>
       </dl>
       <button
@@ -65,18 +65,20 @@
           <input
             id="account-email"
             type="email"
-            formControlName="email"
+            formControlName="privateEmail"
             autocomplete="email"
             maxlength="100"
             aria-describedby="email-hint"
             [attr.aria-invalid]="
-              accountForm.controls.email.touched && accountForm.controls.email.invalid
+              accountForm.controls.privateEmail.touched && accountForm.controls.privateEmail.invalid
             "
           />
           <p class="hint" id="email-hint">
             Your email is private and is not shown on your public profile.
           </p>
-          @if (accountForm.controls.email.touched && accountForm.controls.email.invalid) {
+          @if (
+            accountForm.controls.privateEmail.touched && accountForm.controls.privateEmail.invalid
+          ) {
             <p class="error" role="alert">
               Enter a valid email address of 100 characters or fewer.
             </p>

@@ -4,6 +4,10 @@ import com.teya1337.craigslist.auth.dto.AuthenticatedUserResponse;
 import com.teya1337.craigslist.auth.dto.CsrfTokenResponse;
 import com.teya1337.craigslist.auth.security.UserPrincipal;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
+import com.teya1337.craigslist.user.repository.UserRepository;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -13,9 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
+@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 @RestController
 public class AuthController {
+    private final UserRepository userRepository;
 
     @PostMapping("/login")
     public AuthenticatedUserResponse login(
@@ -29,7 +35,8 @@ public class AuthController {
     public AuthenticatedUserResponse currentUser(
             @NonNull @AuthenticationPrincipal UserPrincipal principal
     ) {
-        return toResponse(principal);
+        return toResponse(UserPrincipal.from(userRepository.findById(principal.getUserId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED))));
     }
 
     @GetMapping("/csrf")
@@ -44,9 +51,10 @@ public class AuthController {
     private AuthenticatedUserResponse toResponse(UserPrincipal principal) {
         return AuthenticatedUserResponse.builder()
                 .id(principal.getUserId())
-                .email(principal.getEmail())
+                .pictureVersion(principal.getPictureVersion())
+                .privateEmail(principal.getPrivateEmail())
                 .username(principal.getUsername())
-                .phoneNumber(principal.getPhoneNumber())
+                .privatePhoneNumber(principal.getPrivatePhoneNumber())
                 .address(principal.getAddress())
                 .status(principal.getStatus())
                 .build();

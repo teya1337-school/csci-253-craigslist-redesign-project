@@ -12,7 +12,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     boolean existsByUsernameIgnoreCaseAndIdNot(String username, UUID userId);
 
-    boolean existsByEmailIgnoreCaseAndIdNot(String email, UUID userId);
+    boolean existsByPrivateEmailIgnoreCaseAndIdNot(String privateEmail, UUID userId);
 
     Optional<User> findByUsername(String username);
 }

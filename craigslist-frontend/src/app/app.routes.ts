@@ -83,7 +83,7 @@ export const routes: Routes = [
     path: 'account',
     component: Account,
     canActivate: [authGuard],
-    title: 'Account | Fresno Exchange',
+    title: 'Account settings | Fresno Exchange',
   },
   { path: '**', redirectTo: '' },
 ];

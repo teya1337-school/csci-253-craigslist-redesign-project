@@ -38,8 +38,8 @@ export class Account {
       ],
     ],
     currentPassword: ['', [Validators.required, Validators.maxLength(200)]],
-    email: [
-      this.user?.email ?? '',
+    privateEmail: [
+      this.user?.privateEmail ?? '',
       [Validators.required, Validators.email, Validators.maxLength(100)],
     ],
   });
@@ -71,7 +71,7 @@ export class Account {
     const user = this.authService.currentUser();
     this.accountForm.reset({
       username: user?.username ?? '',
-      email: user?.email ?? '',
+      privateEmail: user?.privateEmail ?? '',
       currentPassword: '',
     });
     this.accountError.set('');
@@ -103,7 +103,10 @@ export class Account {
     this.accountError.set('');
     this.accountSuccess.set('');
     const account = this.accountForm.getRawValue();
-    this.accountForm.patchValue({ username: account.username.trim(), email: account.email.trim() });
+    this.accountForm.patchValue({
+      username: account.username.trim(),
+      privateEmail: account.privateEmail.trim(),
+    });
     if (this.accountForm.invalid) {
       this.accountForm.markAllAsTouched();
       return;
@@ -129,7 +132,7 @@ export class Account {
           }
           this.accountForm.reset({
             username: user.username,
-            email: user.email,
+            privateEmail: user.privateEmail,
             currentPassword: '',
           });
           this.editingAccount.set(false);

@@ -20,7 +20,7 @@ public class PublicProfileService {
         var user = userRepository.findById(userId)
                 .filter(candidate -> candidate.getStatus() == UserStatus.ACTIVE)
                 .orElseThrow(() -> new ResourceNotFoundException("User profile not found"));
-        return new PublicProfileResponse(user.getId(), user.getUsername(), user.getCreatedAt(),
-                postService.findPublishedPostsByUserId(userId));
+        return new PublicProfileResponse(user.getId(), user.getUsername(), user.getCreatedAt(), user.getBio(), user.getPublicEmail(), user.getPublicPhoneNumber(),
+                user.getPictureVersion(), postService.findPublishedPostsByUserId(userId));
     }
 }

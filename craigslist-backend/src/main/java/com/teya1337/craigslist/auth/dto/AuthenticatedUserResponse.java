@@ -8,9 +8,10 @@ import java.util.UUID;
 @Builder
 public record AuthenticatedUserResponse(
         UUID id,
-        String email,
+        UUID pictureVersion,
+        String privateEmail,
         String username,
-        String phoneNumber,
+        String privatePhoneNumber,
         String address,
         UserStatus status
 ) {}

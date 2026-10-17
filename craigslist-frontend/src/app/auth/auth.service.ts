@@ -13,6 +13,10 @@ export class AuthService {
   readonly currentUser = this.currentUserState.asReadonly();
   readonly isAuthenticated = computed(() => this.currentUserState() !== null);
 
+  updatePictureVersion(pictureVersion: string | null): void {
+    this.currentUserState.update((user) => (user ? { ...user, pictureVersion } : null));
+  }
+
   loadCurrentUser(): Observable<AuthenticatedUser | null> {
     return this.http.get<AuthenticatedUser>('/api/auth/me').pipe(
       tap((user) => this.currentUserState.set(user)),
@@ -33,7 +37,7 @@ export class AuthService {
 
   updateAccount(account: {
     username: string;
-    email: string;
+    privateEmail: string;
   }): Observable<AuthenticatedUser | null> {
     return this.http
       .put<void>('/api/account', account)

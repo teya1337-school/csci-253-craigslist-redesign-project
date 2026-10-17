@@ -14,10 +14,10 @@ class UserPrincipalTests {
     void eraseCredentialsRemovesPasswordFromSessionPrincipal() {
         User user = User.builder()
                 .id(UUID.randomUUID())
-                .email("alice@example.test")
+                .privateEmail("alice@example.test")
                 .username("alice")
                 .password("stored-hash")
-                .phoneNumber("5595550101")
+                .privatePhoneNumber("5595550101")
                 .address("1000 A Street, Fresno, CA 93722")
                 .status(UserStatus.ACTIVE)
                 .build();

@@ -1,0 +1,49 @@
+:host {
+  display: block;
+  margin-bottom: 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #ded8e2;
+}
+.picture-preview {
+  --avatar-size: 96px;
+  margin-bottom: 16px;
+}
+.picture-preview > img {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #756d79;
+}
+button {
+  border: 1px solid #aaa1b0;
+  background: white;
+  color: #643083;
+  padding: 10px 16px;
+  border-radius: 7px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+.error {
+  color: #a12636;
+}
+input:focus-visible,
+button:focus-visible {
+  outline: 3px solid #8c5dad;
+  outline-offset: 3px;
+}

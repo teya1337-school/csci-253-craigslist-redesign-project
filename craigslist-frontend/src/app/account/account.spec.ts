@@ -10,7 +10,7 @@ import { Account } from './account';
 describe('Account', () => {
   afterEach(() => TestBed.resetTestingModule());
   function setup() {
-    const user = { id: 'alice-id', username: 'alice', email: 'alice@example.com' };
+    const user = { id: 'alice-id', username: 'alice', privateEmail: 'alice@example.com' };
     const authService = {
       currentUser: signal(user),
       updateAccount: vi.fn().mockReturnValue(of({ ...user, username: 'new_alice' })),
@@ -28,7 +28,7 @@ describe('Account', () => {
     const { component, authService } = setup();
     expect(component['accountForm'].getRawValue()).toEqual({
       username: 'alice',
-      email: 'alice@example.com',
+      privateEmail: 'alice@example.com',
       currentPassword: '',
     });
     component['editAccount']();
@@ -36,7 +36,7 @@ describe('Account', () => {
     component['saveAccount']();
     expect(authService.updateAccount).toHaveBeenCalledWith({
       username: 'new_alice',
-      email: 'alice@example.com',
+      privateEmail: 'alice@example.com',
       currentPassword: 'old-password',
     });
     expect(component['accountSuccess']()).toContain('saved');

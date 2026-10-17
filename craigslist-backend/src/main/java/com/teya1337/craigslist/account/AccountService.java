@@ -1,6 +1,7 @@
 package com.teya1337.craigslist.account;
 
 import com.teya1337.craigslist.auth.security.UserPrincipal;
+import com.teya1337.craigslist.user.profile.ProfileUpdateRequest;
 import com.teya1337.craigslist.user.entity.User;
 import com.teya1337.craigslist.user.entity.UserStatus;
 import com.teya1337.craigslist.user.repository.UserRepository;
@@ -25,15 +26,15 @@ public class AccountService {
         User user = findActiveUser(userId);
         verifyCurrentPassword(user, request.currentPassword());
         String username = request.username().strip();
-        String email = request.email().strip();
+        String privateEmail = request.privateEmail().strip();
         if (userRepository.existsByUsernameIgnoreCaseAndIdNot(username, userId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "That username is already in use.");
         }
-        if (userRepository.existsByEmailIgnoreCaseAndIdNot(email, userId)) {
+        if (userRepository.existsByPrivateEmailIgnoreCaseAndIdNot(privateEmail, userId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "That email is already in use.");
         }
         user.setUsername(username);
-        user.setEmail(email);
+        user.setPrivateEmail(privateEmail);
         userRepository.saveAndFlush(user);
         return principalWithoutPassword(user);
     }
@@ -65,6 +66,21 @@ public class AccountService {
         }
         user.setStatus(UserStatus.INACTIVE);
         userRepository.saveAndFlush(user);
+    }
+
+    @Transactional
+    public User updateProfile(UUID userId, ProfileUpdateRequest request) {
+        User user = findActiveUser(userId);
+        verifyCurrentPassword(user, request.currentPassword());
+        user.setBio(optionalText(request.bio()));
+        user.setPublicEmail(optionalText(request.publicEmail()));
+        user.setPublicPhoneNumber(optionalText(request.publicPhoneNumber()));
+        userRepository.saveAndFlush(user);
+        return user;
+    }
+
+    private String optionalText(String value) {
+        return value == null || value.isBlank() ? null : value.strip();
     }
 
     private void verifyCurrentPassword(User user, String currentPassword) {

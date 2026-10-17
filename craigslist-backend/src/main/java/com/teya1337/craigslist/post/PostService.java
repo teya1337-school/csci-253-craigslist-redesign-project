@@ -146,7 +146,7 @@ public class PostService {
         return new PostResponse(
                 post.getId(),
                 post.getUser().getId(),
-                post.getUser().getUsername(),
+                post.getUser().getPublicUsername(),
                 post.getTitle(),
                 post.getBody(),
                 post.getCategory(),

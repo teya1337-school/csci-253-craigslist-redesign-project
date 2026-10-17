@@ -110,7 +110,7 @@ public class CommentService {
         return new CommentResponse(
                 comment.getId(),
                 comment.isDeleted() ? null : comment.getUser().getId(),
-                comment.isDeleted() ? "[deleted]" : comment.getUser().getUsername(),
+                comment.isDeleted() ? "[deleted]" : comment.getUser().getPublicUsername(),
                 comment.getPost().getId(),
                 comment.isDeleted() ? "Comment deleted" : comment.getContent(),
                 comment.getParent() == null ? null : comment.getParent().getId(),

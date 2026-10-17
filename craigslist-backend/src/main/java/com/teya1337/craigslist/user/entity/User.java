@@ -58,6 +58,10 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    public String getPublicUsername() {
+        return status == UserStatus.ACTIVE ? username : "[deleted]";
+    }
+
     @PrePersist
     private void onCreate() {
         Instant now = Instant.now();

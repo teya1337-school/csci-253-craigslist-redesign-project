@@ -1,34 +1,298 @@
 <main class="account-page">
   <section class="account-card" aria-labelledby="account-heading">
     <a class="back-link" routerLink="/">← Back to home</a>
-
     <div class="heading-group">
-      <p class="eyebrow">Your profile</p>
+      <p class="eyebrow">Your account</p>
       <h1 id="account-heading">Account</h1>
-      <p>Review the contact information connected to your account.</p>
+      <p>Manage your information and password.</p>
     </div>
 
-    @if (authService.currentUser(); as user) {
-      <dl class="account-details">
+    <h2 id="information-heading">Account information</h2>
+    @if (!editingAccount()) {
+      <dl class="account-summary">
         <div>
           <dt>Username</dt>
-          <dd>{{ user.username }}</dd>
+          <dd>{{ authService.currentUser()?.username }}</dd>
         </div>
         <div>
           <dt>Email</dt>
-          <dd>{{ user.email }}</dd>
-        </div>
-        <div>
-          <dt>Phone number</dt>
-          <dd>{{ user.phoneNumber }}</dd>
-        </div>
-        <div>
-          <dt>Address</dt>
-          <dd>{{ user.address }}</dd>
+          <dd>{{ authService.currentUser()?.email }}</dd>
         </div>
       </dl>
-
-      <p class="read-only-note">Profile editing will be added later.</p>
+      <button
+        type="button"
+        (click)="editAccount()"
+        [disabled]="savingPassword() || deletingAccount()"
+        aria-expanded="false"
+        aria-controls="account-edit-form"
+      >
+        Edit account information
+      </button>
     }
+    @if (accountSuccess()) {
+      <p class="success feedback" role="status">{{ accountSuccess() }}</p>
+    }
+    @if (editingAccount()) {
+      <form
+        id="account-edit-form"
+        [formGroup]="accountForm"
+        (ngSubmit)="saveAccount()"
+        aria-labelledby="information-heading"
+      >
+        <div class="field">
+          <label for="account-username">Username</label>
+          <input
+            id="account-username"
+            formControlName="username"
+            autocomplete="username"
+            maxlength="100"
+            aria-describedby="username-hint"
+            [attr.aria-invalid]="
+              accountForm.controls.username.touched && accountForm.controls.username.invalid
+            "
+          />
+          <p class="hint" id="username-hint">
+            3–100 characters. Use letters, numbers, or underscores. This name is public.
+          </p>
+          @if (accountForm.controls.username.touched && accountForm.controls.username.invalid) {
+            <p class="error" role="alert">
+              Enter a username with 3–100 letters, numbers, or underscores.
+            </p>
+          }
+        </div>
+        <div class="field">
+          <label for="account-email">Email</label>
+          <input
+            id="account-email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            maxlength="100"
+            aria-describedby="email-hint"
+            [attr.aria-invalid]="
+              accountForm.controls.email.touched && accountForm.controls.email.invalid
+            "
+          />
+          <p class="hint" id="email-hint">
+            Your email is private and is not shown on your public profile.
+          </p>
+          @if (accountForm.controls.email.touched && accountForm.controls.email.invalid) {
+            <p class="error" role="alert">
+              Enter a valid email address of 100 characters or fewer.
+            </p>
+          }
+        </div>
+        <div class="field">
+          <label for="account-current-password">Current password</label>
+          <input
+            id="account-current-password"
+            type="password"
+            formControlName="currentPassword"
+            autocomplete="current-password"
+            maxlength="200"
+            aria-describedby="account-password-hint account-password-error"
+            [attr.aria-invalid]="
+              accountForm.controls.currentPassword.touched &&
+              accountForm.controls.currentPassword.invalid
+            "
+          />
+          <p class="hint" id="account-password-hint">
+            Enter your current password to save account changes.
+          </p>
+          <div id="account-password-error">
+            @if (
+              accountForm.controls.currentPassword.touched &&
+              accountForm.controls.currentPassword.invalid
+            ) {
+              <p class="error" role="alert">Enter your current password.</p>
+            }
+          </div>
+        </div>
+        @if (accountError()) {
+          <p class="error feedback" role="alert">{{ accountError() }}</p>
+        }
+
+        <div class="actions">
+          <button
+            type="button"
+            class="secondary"
+            (click)="cancelAccount()"
+            [disabled]="savingAccount() || deletingAccount()"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            [disabled]="savingAccount() || savingPassword() || accountForm.pristine"
+          >
+            {{ savingAccount() ? 'Saving…' : 'Save changes' }}
+          </button>
+        </div>
+      </form>
+    }
+
+    <section class="password-section" aria-labelledby="password-heading">
+      <h2 id="password-heading">Password</h2>
+      @if (passwordSuccess()) {
+        <p class="success feedback" role="status">{{ passwordSuccess() }}</p>
+      }
+      @if (!editingPassword()) {
+        <button
+          type="button"
+          (click)="editPassword()"
+          [disabled]="savingAccount() || deletingAccount()"
+          aria-expanded="false"
+          aria-controls="password-edit-form"
+        >
+          Change password
+        </button>
+      }
+      @if (editingPassword()) {
+        <form
+          id="password-edit-form"
+          [formGroup]="passwordForm"
+          (ngSubmit)="changePassword()"
+          aria-labelledby="password-heading"
+        >
+          <div class="field">
+            <label for="current-password">Current password</label>
+            <input
+              id="current-password"
+              type="password"
+              formControlName="currentPassword"
+              autocomplete="current-password"
+              maxlength="200"
+            />
+            @if (
+              passwordForm.controls.currentPassword.touched &&
+              passwordForm.controls.currentPassword.invalid
+            ) {
+              <p class="error" role="alert">Enter your current password.</p>
+            }
+          </div>
+          <div class="field">
+            <label for="new-password">New password</label>
+            <input
+              id="new-password"
+              type="password"
+              formControlName="newPassword"
+              autocomplete="new-password"
+              maxlength="72"
+              aria-describedby="password-hint"
+            />
+            <p class="hint" id="password-hint">
+              Use 8–72 characters, different from your current password.
+            </p>
+            @if (
+              passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.invalid
+            ) {
+              <p class="error" role="alert">Enter a new password with 8–72 characters.</p>
+            }
+          </div>
+          <div class="field">
+            <label for="confirm-password">Confirm new password</label>
+            <input
+              id="confirm-password"
+              type="password"
+              formControlName="confirmPassword"
+              autocomplete="new-password"
+              maxlength="72"
+            />
+            @if (
+              passwordForm.controls.confirmPassword.touched &&
+              passwordForm.controls.confirmPassword.invalid
+            ) {
+              <p class="error" role="alert">Confirm your new password.</p>
+            }
+          </div>
+          @if (passwordError()) {
+            <p class="error feedback" role="alert">{{ passwordError() }}</p>
+          }
+
+          <div class="actions">
+            <button
+              type="button"
+              class="secondary"
+              (click)="cancelPassword()"
+              [disabled]="savingPassword() || deletingAccount()"
+            >
+              Cancel
+            </button>
+            <button type="submit" [disabled]="savingPassword() || savingAccount()">
+              {{ savingPassword() ? 'Changing…' : 'Change password' }}
+            </button>
+          </div>
+        </form>
+      }
+    </section>
+    <section class="delete-section" aria-labelledby="delete-heading">
+      <h2 id="delete-heading">Delete account</h2>
+      @if (!confirmingDeletion()) {
+        <p class="hint">Close your account and remove your public profile.</p>
+        <button
+          class="danger"
+          type="button"
+          (click)="showDeleteConfirmation()"
+          [disabled]="savingAccount() || savingPassword()"
+        >
+          Delete account
+        </button>
+      } @else {
+        <p>
+          Your account will be deactivated and you will be signed out. You will no longer be able to
+          sign in or use your public profile.
+        </p>
+        <p>
+          Your posts, comments, and messages sent to others will remain under
+          <strong>[deleted]</strong> to preserve discussions. Other people will no longer be able to
+          message you.
+        </p>
+        <p>You cannot undo this from the website.</p>
+        <form [formGroup]="deleteForm" (ngSubmit)="deleteAccount()">
+          <div class="field">
+            <label for="delete-current-password">Current password</label>
+            <input
+              id="delete-current-password"
+              type="password"
+              formControlName="currentPassword"
+              autocomplete="current-password"
+              maxlength="200"
+              aria-describedby="delete-password-error"
+            />
+            <div id="delete-password-error">
+              @if (
+                deleteForm.controls.currentPassword.touched &&
+                deleteForm.controls.currentPassword.invalid
+              ) {
+                <p class="error" role="alert">Enter your current password.</p>
+              }
+            </div>
+          </div>
+          <label class="confirmation"
+            ><input type="checkbox" formControlName="confirmed" />I understand the consequences and
+            want to delete my account.</label
+          >
+          @if (deleteForm.controls.confirmed.touched && deleteForm.controls.confirmed.invalid) {
+            <p class="error" role="alert">Confirm that you want to delete your account.</p>
+          }
+          @if (deleteError()) {
+            <p class="error feedback" role="alert">{{ deleteError() }}</p>
+          }
+          <div class="actions">
+            <button
+              type="button"
+              class="secondary"
+              (click)="cancelDeletion()"
+              [disabled]="deletingAccount()"
+            >
+              Cancel
+            </button>
+            <button class="danger" type="submit" [disabled]="deletingAccount()">
+              {{ deletingAccount() ? 'Deleting…' : 'Delete account' }}
+            </button>
+          </div>
+        </form>
+      }
+    </section>
   </section>
 </main>

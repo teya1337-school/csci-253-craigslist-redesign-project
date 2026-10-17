@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
   selector: 'app-user-link',
   imports: [RouterLink],
   template: `
-    @if (userId()) {
+    @if (userId() && username() !== '[deleted]') {
       <a [routerLink]="['/users', userId()]" [attr.aria-label]="'View profile of ' + username()">{{
         username()
       }}</a>

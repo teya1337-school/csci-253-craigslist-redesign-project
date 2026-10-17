@@ -77,8 +77,8 @@ public class DirectMessageService {
     private ResourceNotFoundException notFound() { return new ResourceNotFoundException("Message not found."); }
 
     private DirectMessageResponse toResponse(DirectMessage message) {
-        return new DirectMessageResponse(message.getId(), message.getSender().getId(), message.getSender().getUsername(),
-                message.getRecipient().getId(), message.getRecipient().getUsername(), message.getSubject(),
+        return new DirectMessageResponse(message.getId(), message.getSender().getId(), message.getSender().getPublicUsername(),
+                message.getRecipient().getId(), message.getRecipient().getPublicUsername(), message.getSubject(),
                 message.getBody(), message.getSentAt(), message.getReadAt());
     }
 }

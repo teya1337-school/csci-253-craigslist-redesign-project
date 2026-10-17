@@ -31,6 +31,29 @@ export class AuthService {
     );
   }
 
+  updateAccount(account: {
+    username: string;
+    email: string;
+  }): Observable<AuthenticatedUser | null> {
+    return this.http
+      .put<void>('/api/account', account)
+      .pipe(switchMap(() => this.loadCurrentUser()));
+  }
+
+  changePassword(password: {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }): Observable<void> {
+    return this.http.put<void>('/api/account/password', password);
+  }
+
+  deleteAccount(account: { currentPassword: string; confirmed: boolean }): Observable<void> {
+    return this.http
+      .delete<void>('/api/account', { body: account })
+      .pipe(tap(() => this.currentUserState.set(null)));
+  }
+
   logout(): Observable<void> {
     return this.getCsrfToken().pipe(
       switchMap(() => this.http.post<void>('/api/auth/logout', null)),

@@ -1,6 +1,8 @@
 package com.teya1337.craigslist.auth.security;
 
 import jakarta.servlet.http.HttpServletResponse;
+import com.teya1337.craigslist.user.repository.UserRepository;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +29,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(
             @NonNull HttpSecurity http,
             UserAuthenticationManager userAuthenticationManager,
-            ObjectMapper objectMapper
+            ObjectMapper objectMapper,
+            UserRepository userRepository
     ) throws Exception {
         http
                 .cors(Customizer.withDefaults())
@@ -55,6 +58,7 @@ public class SecurityConfig {
                         .deleteCookies("SESSION")
                         .permitAll()
                 )
+                .addFilterAfter(new ActiveAccountFilter(userRepository), SecurityContextHolderFilter.class)
                 .addFilterAt(
                         new UserAuthenticationFilter(userAuthenticationManager, objectMapper),
                         UsernamePasswordAuthenticationFilter.class

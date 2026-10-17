@@ -45,7 +45,7 @@
           >
             Delete message
           </button>
-          @if (mailbox === 'INBOX') {
+          @if (mailbox === 'INBOX' && item.senderUsername !== '[deleted]') {
             <a
               class="button primary"
               routerLink="/messages/new"

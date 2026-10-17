@@ -1,5 +1,10 @@
 <main class="home-page">
   <div class="page-shell">
+    @if (accountDeleted) {
+      <p class="account-deleted" role="status">
+        Your account was deleted. You have been signed out.
+      </p>
+    }
     <header class="hero">
       <p class="eyebrow">Fresno Exchange</p>
       <h1>Find what your community is talking about.</h1>

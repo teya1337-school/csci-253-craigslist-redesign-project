@@ -12,7 +12,7 @@ import { Component, input } from '@angular/core';
       display: inline;
     }
     .edited-label {
-      color: #716a74;
+      color: #687482;
       font-size: 0.82rem;
       font-weight: 400;
     }

@@ -15,7 +15,7 @@ import { RouterLink } from '@angular/router';
   `,
   styles: `
     :host {
-      color: #59316d;
+      color: #1d4c91;
       font-weight: 700;
     }
     a {
@@ -26,7 +26,7 @@ import { RouterLink } from '@angular/router';
       text-decoration: underline;
     }
     a:focus-visible {
-      outline: 3px solid #8c5dad;
+      outline: 3px solid #a9c5ec;
       outline-offset: 3px;
     }
   `,

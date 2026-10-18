@@ -10,7 +10,8 @@ public enum PostCategory {
 
     public boolean supports(PostType postType) {
         return switch (this) {
-            case COMMUNITY -> postType == PostType.GENERAL || postType == PostType.EVENTS;
+            case COMMUNITY -> postType == PostType.GENERAL || postType == PostType.EVENTS
+                    || postType == PostType.GROUPS;
             case SERVICES -> postType == PostType.COMPUTER || postType == PostType.AUTOMOTIVE;
             case FOR_SALE -> postType == PostType.ELECTRONICS || postType == PostType.FURNITURE;
             case HOUSING -> postType == PostType.APARTMENTS || postType == PostType.ROOMS;

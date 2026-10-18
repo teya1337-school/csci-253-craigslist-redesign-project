@@ -27,12 +27,15 @@ import { PostService } from '../post.service';
   styleUrl: './my-posts.scss',
 })
 export class MyPosts implements OnInit {
-  protected readonly destinationFor = findPostDestination;
   private readonly postService = inject(PostService);
   private readonly route = inject(ActivatedRoute);
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
+
   private menuTrigger?: HTMLButtonElement;
+
+  protected readonly destinationFor = findPostDestination;
+
   protected readonly posts = signal<PostResponse[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly errorMessage = signal<string | null>(null);
@@ -44,17 +47,21 @@ export class MyPosts implements OnInit {
   protected readonly selectedStatus = signal<'PUBLISHED' | 'UNPUBLISHED'>('PUBLISHED');
   protected readonly changingPublication = signal<string | null>(null);
   protected readonly publicationError = signal('');
+
   protected readonly publishedPosts = computed(() =>
     this.posts().filter((post) => post.status === 'PUBLISHED'),
   );
+
   protected readonly unpublishedPosts = computed(() =>
     this.posts().filter((post) => post.status === 'UNPUBLISHED'),
   );
+
   protected readonly visiblePosts = computed(() =>
     this.selectedStatus() === 'PUBLISHED' ? this.publishedPosts() : this.unpublishedPosts(),
   );
 
   ngOnInit(): void {
+    // Listen for query param changes to update the selected status and reset messages.
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       this.statusMessage.set('');
       this.publicationError.set('');
@@ -62,37 +69,46 @@ export class MyPosts implements OnInit {
       this.closeMenu();
       this.pendingDelete.set(null);
     });
+
+    // Show a status message if the user was redirected here after saving changes to a post.
     if (this.route.snapshot.queryParamMap.get('updated') === 'true') {
       this.statusMessage.set('Your changes were saved.');
     }
+
+    // Load the user's posts.
     this.loadPosts();
   }
 
+  // Load the user's posts from the server and handle loading state and errors.
   protected loadPosts(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
-    this.postService
-      .getMyPosts()
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: (posts) =>
-          this.posts.set(
-            [...posts].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)),
-          ),
-        error: (error: HttpErrorResponse) =>
-          this.errorMessage.set(
-            error.status === 401
-              ? 'Your session has expired. Sign in again to view your posts.'
-              : 'We could not load your posts. Please try again.',
-          ),
-      });
+
+    // Fetch the user's posts and sort them by creation date in descending order.
+    this.postService.getMyPosts().pipe(
+      finalize(() => this.isLoading.set(false))
+    ).subscribe({
+      next: (posts) =>
+        this.posts.set(
+          [...posts].sort((a, b) =>
+            Date.parse(b.createdAt) - Date.parse(a.createdAt)),
+        ),
+      error: (error: HttpErrorResponse) =>
+        this.errorMessage.set(
+          error.status === 401
+            ? 'Your session has expired. Sign in again to view your posts.'
+            : 'We could not load your posts. Please try again.',
+        ),
+    });
   }
 
+  // Close the menu when clicking outside of it.
   @HostListener('document:click')
   protected closeMenu(): void {
     this.openMenuId.set(null);
   }
 
+  // Close the menu when pressing the Escape key and return focus to the menu trigger button.
   @HostListener('document:keydown.escape')
   protected closeWithEscape(): void {
     if (this.openMenuId()) {
@@ -101,10 +117,16 @@ export class MyPosts implements OnInit {
     }
   }
 
+  // Toggle the menu for a specific post and manage focus for accessibility.
   protected toggleMenu(postId: string, event: Event): void {
     event.stopPropagation();
+
     this.menuTrigger = event.currentTarget as HTMLButtonElement;
+
+    // Toggle the menu open or closed based on the current state.
     this.openMenuId.update((id) => (id === postId ? null : postId));
+
+    // If the menu is opened, focus the first menu item for accessibility.
     if (this.openMenuId()) {
       setTimeout(() =>
         this.element.nativeElement.querySelector<HTMLElement>('[role="menuitem"]')?.focus(),
@@ -112,31 +134,43 @@ export class MyPosts implements OnInit {
     }
   }
 
+  // Handle keyboard navigation within the menu using ArrowUp and ArrowDown keys.
   protected moveMenuFocus(event: KeyboardEvent): void {
-    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') {
+      return;
+    }
+
     event.preventDefault();
+
     const items = [
       ...this.element.nativeElement.querySelectorAll<HTMLElement>('[role="menuitem"]'),
     ];
+
     const index = items.indexOf(event.target as HTMLElement);
+
     items[(index + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length]?.focus();
   }
 
+  // Change the publication status of a post and handle loading state and errors.
   protected changePublication(post: PostResponse): void {
-    if (this.changingPublication()) return;
+    if (this.changingPublication()) {
+      return;
+    }
+
     this.closeMenu();
+
     this.pendingDelete.set(null);
     this.publicationError.set('');
     this.statusMessage.set('');
     this.changingPublication.set(post.id);
+
     const published = post.status !== 'PUBLISHED';
-    this.postService
-      .changePublication(post.id, published)
-      .pipe(
+
+    // Call the service to change the publication status and update the local state accordingly.
+    this.postService.changePublication(post.id, published).pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.changingPublication.set(null)),
-      )
-      .subscribe({
+      ).subscribe({
         next: (updated) => {
           this.posts.update((posts) =>
             posts.map((item) => (item.id === updated.id ? updated : item)),
@@ -157,8 +191,10 @@ export class MyPosts implements OnInit {
 
   protected confirmDelete(post: PostResponse): void {
     this.closeMenu();
+
     this.pendingDelete.set(post);
     this.deleteError.set(null);
+
     setTimeout(() =>
       this.element.nativeElement.querySelector<HTMLButtonElement>('.cancel-delete')?.focus(),
     );
@@ -170,14 +206,19 @@ export class MyPosts implements OnInit {
     this.menuTrigger?.focus();
   }
 
+  // Delete the post if it is not already being deleted and handle loading state and errors.
   protected deletePost(): void {
     const post = this.pendingDelete();
-    if (!post || this.isDeleting()) return;
+
+    if (!post || this.isDeleting()) {
+      return;
+    }
+
     this.isDeleting.set(true);
     this.deleteError.set(null);
-    this.postService
-      .deletePost(post.id)
-      .pipe(finalize(() => this.isDeleting.set(false)))
+
+    // Call the service to delete the post and update the local state accordingly.
+    this.postService.deletePost(post.id).pipe(finalize(() => this.isDeleting.set(false)))
       .subscribe({
         next: () => {
           this.posts.update((posts) => posts.filter((item) => item.id !== post.id));

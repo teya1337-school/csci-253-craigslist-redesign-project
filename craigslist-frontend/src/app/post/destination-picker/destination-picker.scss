@@ -7,7 +7,7 @@
 }
 .field-label,
 label {
-  color: #332e36;
+  color: #263443;
   font-weight: 750;
 }
 .destination-trigger {
@@ -20,17 +20,17 @@ label {
   min-height: 44px;
   padding: 10px 14px;
   border: 1px solid #a7a0aa;
-  border-radius: 24px;
+  border-radius: 4px;
   background: white;
-  color: #59316d;
+  color: #1d4c91;
   font: inherit;
   font-weight: 650;
   text-align: left;
   cursor: pointer;
 }
 .destination-trigger:hover {
-  background: #fcf9fd;
-  border-color: #70418c;
+  background: #fafbfd;
+  border-color: #4f78b5;
 }
 .destination-trigger svg {
   width: 18px;
@@ -49,7 +49,7 @@ label {
   line-height: 1.45;
 }
 .hint {
-  color: #746d77;
+  color: #687482;
 }
 .error {
   color: #982626;
@@ -59,9 +59,9 @@ label {
 }
 .destination-options {
   padding: 18px;
-  border: 1px solid #ded9e1;
-  border-radius: 10px;
-  background: #fcf9fd;
+  border: 1px solid #d9dfe6;
+  border-radius: 4px;
+  background: #fafbfd;
 }
 .select-fields {
   display: grid;
@@ -78,14 +78,14 @@ select {
   min-height: 44px;
   padding: 10px;
   border: 1px solid #a7a0aa;
-  border-radius: 8px;
+  border-radius: 4px;
   background: white;
-  color: #211d23;
+  color: #1d2530;
   font: inherit;
 }
 select:disabled {
-  color: #746d77;
-  background: #f1eef2;
+  color: #687482;
+  background: #eef1f4;
 }
 .picker-actions {
   display: flex;
@@ -98,16 +98,16 @@ select:disabled {
   min-height: 40px;
   padding: 8px 14px;
   border: 1px solid #a59da8;
-  border-radius: 7px;
+  border-radius: 4px;
   background: white;
-  color: #4f4752;
+  color: #4b5663;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
 }
 .picker-actions .apply-button {
-  background: #642f83;
-  border-color: #642f83;
+  background: #2457a7;
+  border-color: #2457a7;
   color: white;
 }
 button:disabled {
@@ -116,7 +116,7 @@ button:disabled {
 }
 button:focus-visible,
 select:focus-visible {
-  outline: 3px solid #8c5dad;
+  outline: 3px solid #a9c5ec;
   outline-offset: 3px;
 }
 @media (max-width: 500px) {

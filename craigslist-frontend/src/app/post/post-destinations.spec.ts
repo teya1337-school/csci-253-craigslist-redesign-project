@@ -11,12 +11,16 @@ import { PostService } from './post.service';
 import { routes } from '../app.routes';
 
 afterEach(() => TestBed.resetTestingModule());
-it('exposes six categories with two distinct routable destinations each', () => {
+it('exposes six categories with distinct routable destinations', () => {
   expect(postCategories).toHaveLength(6);
-  expect(postDestinations).toHaveLength(12);
-  expect(new Set(postDestinations.map((item) => item.path)).size).toBe(12);
+  expect(postDestinations).toHaveLength(13);
+  expect(new Set(postDestinations.map((item) => item.path)).size).toBe(13);
   for (const category of postCategories) {
-    expect(postDestinations.filter((item) => item.category === category.category)).toHaveLength(2);
+    const expectedTypeCount = category.category === 'COMMUNITY' ? 3 : 2;
+    const destinations = postDestinations.filter((item) => item.category === category.category);
+    expect(destinations).toHaveLength(expectedTypeCount);
+    const typeLabels = destinations.map((item) => item.typeLabel);
+    expect(typeLabels).toEqual([...typeLabels].sort());
     expect(routes.some((route) => route.path === category.path.slice(1))).toBe(true);
   }
 });

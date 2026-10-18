@@ -22,7 +22,7 @@ export const postCategories: readonly PostCategoryOption[] = [
     category: 'COMMUNITY',
     label: 'Community',
     path: '/community',
-    description: 'Local conversations, questions, and events.',
+    description: 'Local conversations, events, clubs, and shared-interest groups.',
     iconPath: 'M4 5h24v18H14l-7 5v-5H4Z M9 11h14M9 16h9',
   },
   {
@@ -63,6 +63,7 @@ export const postCategories: readonly PostCategoryOption[] = [
 ];
 
 const types: readonly [PostCategory, PostType, string, string, string][] = [
+  ['COMMUNITY', 'EVENTS', 'Events', 'events', 'Share local events, gatherings, and activities.'],
   [
     'COMMUNITY',
     'GENERAL',
@@ -70,13 +71,12 @@ const types: readonly [PostCategory, PostType, string, string, string][] = [
     'general',
     'Everyday local conversations, questions, and shared information.',
   ],
-  ['COMMUNITY', 'EVENTS', 'Events', 'events', 'Share local events, gatherings, and activities.'],
   [
-    'SERVICES',
-    'COMPUTER',
-    'Computer',
-    'computer',
-    'Find or offer computer repairs, setup, and technical help.',
+    'COMMUNITY',
+    'GROUPS',
+    'Groups',
+    'groups',
+    'Find or organize local clubs, meetups, and shared-interest groups.',
   ],
   [
     'SERVICES',
@@ -84,6 +84,13 @@ const types: readonly [PostCategory, PostType, string, string, string][] = [
     'Automotive',
     'automotive',
     'Find or offer vehicle maintenance and repair services.',
+  ],
+  [
+    'SERVICES',
+    'COMPUTER',
+    'Computer',
+    'computer',
+    'Find or offer computer repairs, setup, and technical help.',
   ],
   [
     'FOR_SALE',

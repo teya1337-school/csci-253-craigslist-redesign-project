@@ -41,68 +41,70 @@ interface PublicProfile {
   styleUrls: ['../../community/general/general.scss', './user-profile.scss'],
 })
 export class UserProfile implements OnInit {
-  protected readonly destinationFor = findPostDestination;
   protected readonly authService = inject(AuthService);
   private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);
   private readonly title = inject(Title);
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(FormBuilder);
+
+  private readonly reload = new Subject<void>();
+
   private saveRequest?: Subscription;
+
   private pictureDraft: PictureDraft = { file: null, removePicture: false };
+
+  protected readonly destinationFor = findPostDestination;
+
   protected readonly editing = signal(false);
   protected readonly saving = signal(false);
   protected readonly saveError = signal('');
   protected readonly saveSuccess = signal('');
+  protected readonly profile = signal<PublicProfile | null>(null);
+  protected readonly isLoading = signal(true);
+  protected readonly errorMessage = signal<string | null>(null);
+
   protected readonly profileForm = this.formBuilder.nonNullable.group({
     bio: ['', Validators.maxLength(1000)],
     publicEmail: ['', [Validators.email, Validators.maxLength(100)]],
     publicPhoneNumber: ['', [Validators.maxLength(30), Validators.pattern(/^[0-9+(). \-]*$/)]],
     currentPassword: ['', [Validators.required, Validators.maxLength(200)]],
   });
-  private readonly reload = new Subject<void>();
-  protected readonly profile = signal<PublicProfile | null>(null);
-  protected readonly isLoading = signal(true);
-  protected readonly errorMessage = signal<string | null>(null);
 
   ngOnInit(): void {
-    combineLatest([this.route.paramMap, this.reload.pipe(startWith(undefined))])
-      .pipe(
-        switchMap(([params]) => {
-          this.saveRequest?.unsubscribe();
-          this.cancelEdit();
-          this.saveSuccess.set('');
-          this.profile.set(null);
-          this.isLoading.set(true);
-          this.errorMessage.set(null);
-          return this.http
-            .get<PublicProfile>(
-              `/api/users/${encodeURIComponent(params.get('userId') ?? '')}/profile`,
-            )
-            .pipe(
-              catchError((error: HttpErrorResponse) => {
-                this.errorMessage.set(
-                  error.status === 404
-                    ? 'This user profile could not be found.'
-                    : 'We could not load this profile. Please try again.',
-                );
-                return of(null);
-              }),
-            );
-        }),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe((profile) => {
-        this.profile.set(profile);
-        this.isLoading.set(false);
-        this.title.setTitle(
-          profile
-            ? `${profile.username} | Fresno Exchange`
-            : 'Profile unavailable | Fresno Exchange',
-        );
-      });
+    // Load the profile when the route changes or when a reload is triggered.
+    combineLatest([this.route.paramMap, this.reload.pipe(startWith(undefined))]).pipe(
+      switchMap(([params]) => {
+        this.saveRequest?.unsubscribe();
+        this.cancelEdit();
+        this.saveSuccess.set('');
+        this.profile.set(null);
+        this.isLoading.set(true);
+        this.errorMessage.set(null);
+        return this.http.get<PublicProfile>(
+            `/api/users/${encodeURIComponent(params.get('userId') ?? '')}/profile`
+        ).pipe(
+          catchError((error: HttpErrorResponse) => {
+            this.errorMessage.set(
+              error.status === 404
+                ? 'This user profile could not be found.'
+                : 'We could not load this profile. Please try again.',
+              );
+            return of(null);
+          }),
+          );
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe((profile) => {
+      this.profile.set(profile);
+      this.isLoading.set(false);
+      this.title.setTitle(
+        profile ? `${profile.username} | ListNova` : 'Profile unavailable | ListNova',
+      );
+    });
   }
 
+  // Start editing the profile if the current user is viewing their own profile.
   protected editProfile(): void {
     const profile = this.profile();
     if (!profile || profile.id !== this.authService.currentUser()?.id) return;
@@ -117,6 +119,7 @@ export class UserProfile implements OnInit {
     this.editing.set(true);
   }
 
+  // Cancel editing the profile and reset the form.
   protected cancelEdit(): void {
     this.pictureDraft = { file: null, removePicture: false };
     this.profileForm.reset();
@@ -124,76 +127,94 @@ export class UserProfile implements OnInit {
     this.saveError.set('');
   }
 
+  // Save the profile changes to the server.
   protected saveProfile(): void {
     const profile = this.profile();
-    if (
-      !this.editing() ||
-      this.saving() ||
-      !profile ||
-      profile.id !== this.authService.currentUser()?.id
-    )
+
+    const isNotValidToSave = !this.editing()
+      || this.saving()
+      || !profile
+      || profile.id !== this.authService.currentUser()?.id;
+
+    if (isNotValidToSave) {
       return;
+    }
+
     const values = this.profileForm.getRawValue();
+
     this.profileForm.patchValue({
       bio: values.bio.trim(),
       publicEmail: values.publicEmail.trim(),
       publicPhoneNumber: values.publicPhoneNumber.trim(),
     });
+
     this.saveError.set('');
+
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
       return;
     }
+
     const update = this.profileForm.getRawValue();
+
     const data = new FormData();
+
     data.append('profile', new Blob([JSON.stringify(update)], { type: 'application/json' }));
-    if (this.pictureDraft.file) data.append('file', this.pictureDraft.file);
+
+    if (this.pictureDraft.file) {
+      data.append('file', this.pictureDraft.file);
+    }
+
     data.append('removePicture', String(this.pictureDraft.removePicture));
+
     this.saving.set(true);
+
     this.profileForm.disable();
-    this.saveRequest = this.http
-      .put<{ pictureVersion: string | null }>('/api/account/profile', data)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => {
-          this.saving.set(false);
-          this.profileForm.enable();
-          this.profileForm.controls.currentPassword.reset();
-        }),
-      )
-      .subscribe({
-        next: (result) => {
-          this.authService.updatePictureVersion(result.pictureVersion);
-          this.profile.set({
-            ...profile,
-            pictureVersion: result.pictureVersion,
-            bio: update.bio || null,
-            publicEmail: update.publicEmail || null,
-            publicPhoneNumber: update.publicPhoneNumber || null,
-          });
-          this.cancelEdit();
-          this.saveSuccess.set('Your profile was updated.');
-        },
-        error: (error: HttpErrorResponse) =>
-          this.saveError.set(
-            error.status === 401
-              ? 'Please sign in again to edit your profile.'
-              : (error.status === 400 || error.status === 413) &&
-                  typeof error.error?.detail === 'string'
-                ? error.error.detail
-                : 'We could not update your profile. Please try again.',
-          ),
-      });
+
+    // Send the update request to the server.
+    this.saveRequest = this.http.put<{ pictureVersion: string | null }>('/api/account/profile', data).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => {
+        this.saving.set(false);
+        this.profileForm.enable();
+        this.profileForm.controls.currentPassword.reset();
+      }),
+    ).subscribe({
+      next: (result) => {
+        this.authService.updatePictureVersion(result.pictureVersion);
+        this.profile.set({
+          ...profile,
+          pictureVersion: result.pictureVersion,
+          bio: update.bio || null,
+          publicEmail: update.publicEmail || null,
+          publicPhoneNumber: update.publicPhoneNumber || null,
+        });
+        this.cancelEdit();
+        this.saveSuccess.set('Your profile was updated.');
+      },
+      error: (error: HttpErrorResponse) =>
+        this.saveError.set(
+          error.status === 401
+            ? 'Please sign in again to edit your profile.'
+            : (error.status === 400 || error.status === 413) &&
+                typeof error.error?.detail === 'string'
+              ? error.error.detail
+              : 'We could not update your profile. Please try again.',
+        ),
+    });
   }
 
+  // Handle changes to the profile picture draft.
   protected pictureChanged(draft: PictureDraft): void {
     this.pictureDraft = draft;
   }
 
+  // Generate a mailto link for the given email address.
   protected emailLink(email: string): string {
     return 'mailto:' + encodeURIComponent(email);
   }
 
+  // Retry loading the profile when an error occurs.
   protected retry(): void {
     this.reload.next();
   }

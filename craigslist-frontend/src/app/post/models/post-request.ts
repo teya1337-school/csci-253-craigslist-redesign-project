@@ -2,6 +2,7 @@ export type PostCategory = 'COMMUNITY' | 'SERVICES' | 'FOR_SALE' | 'HOUSING' | '
 export type PostType =
   | 'GENERAL'
   | 'EVENTS'
+  | 'GROUPS'
   | 'COMPUTER'
   | 'AUTOMOTIVE'
   | 'ELECTRONICS'

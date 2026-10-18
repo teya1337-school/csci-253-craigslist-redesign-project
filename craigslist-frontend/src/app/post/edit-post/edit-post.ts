@@ -15,24 +15,27 @@ import { PostService } from '../post.service';
   styleUrl: './edit-post.scss',
 })
 export class EditPost implements OnInit {
+  private readonly authService = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly formBuilder = inject(FormBuilder);
   private readonly postService = inject(PostService);
 
-  protected readonly authService = inject(AuthService);
-  protected readonly returnToMyPosts =
-    this.route.snapshot.queryParamMap.get('returnTo') === 'my-posts';
+  protected readonly returnToMyPosts = this.route.snapshot.queryParamMap.get('returnTo') === 'my-posts';
   protected readonly postId = this.route.snapshot.paramMap.get('postId');
+
   protected readonly destination = signal<PostDestination | null>(null);
   protected readonly publicationStatus = signal('PUBLISHED');
+
   protected readonly isLoading = signal(true);
   protected readonly isSubmitting = signal(false);
+
   protected readonly loadError = signal<string | null>(null);
   protected readonly submitError = signal<string | null>(null);
 
   protected readonly pictureDraft = signal<PostPictureDraft>({ files: [], removedPictureIds: [] });
   protected readonly pictureIds = signal<string[]>([]);
+
   protected readonly postForm = this.formBuilder.nonNullable.group({
     title: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(200)]],
     body: ['', [Validators.required, Validators.pattern(/\S/)]],
@@ -44,6 +47,7 @@ export class EditPost implements OnInit {
     this.loadPost();
   }
 
+  // Load the post data from the server and populate the form.
   protected loadPost(): void {
     if (!this.postId) {
       this.isLoading.set(false);
@@ -54,9 +58,8 @@ export class EditPost implements OnInit {
     this.isLoading.set(true);
     this.loadError.set(null);
 
-    this.postService
-      .getPost(this.postId)
-      .pipe(finalize(() => this.isLoading.set(false)))
+    // Load the post data from the server and populate the form.
+    this.postService.getPost(this.postId).pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (post) => {
           if (post.userId !== this.authService.currentUser()?.id) {
@@ -68,6 +71,7 @@ export class EditPost implements OnInit {
           this.pictureDraft.set({ files: [], removedPictureIds: [] });
           this.destination.set(findPostDestination(post) ?? null);
           this.publicationStatus.set(post.status);
+
           this.postForm.setValue({
             title: post.title,
             body: post.body,
@@ -85,6 +89,7 @@ export class EditPost implements OnInit {
       });
   }
 
+  // Submit the form to update the post.
   protected submit(): void {
     this.submitError.set(null);
 
@@ -94,18 +99,22 @@ export class EditPost implements OnInit {
     }
 
     const destination = this.destination();
-    if (!destination) return;
+
+    if (!destination) {
+      return;
+    }
+
     const values = this.postForm.getRawValue();
     const location = values.location.trim();
 
     this.isSubmitting.set(true);
     this.postForm.disable();
 
-    this.postService
-      .updatePost(
-        this.postId,
-        {
-          title: values.title.trim(),
+    // Update the post using the PostService.
+    this.postService.updatePost(
+      this.postId,
+      {
+        title: values.title.trim(),
           body: values.body.trim(),
           category: destination.category,
           postType: destination.postType,
@@ -114,14 +123,12 @@ export class EditPost implements OnInit {
         },
         this.pictureDraft().files,
         this.pictureDraft().removedPictureIds,
-      )
-      .pipe(
+      ).pipe(
         finalize(() => {
           this.isSubmitting.set(false);
           this.postForm.enable();
         }),
-      )
-      .subscribe({
+      ).subscribe({
         next: () => {
           void this.router.navigate(
             this.returnToMyPosts ? ['/my-posts'] : ['/posts', this.postId],

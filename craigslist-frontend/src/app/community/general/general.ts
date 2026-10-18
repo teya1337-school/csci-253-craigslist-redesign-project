@@ -18,13 +18,14 @@ import { PostService } from '../../post/post.service';
   styleUrl: './general.scss',
 })
 export class General implements OnInit {
+  protected readonly authService = inject(AuthService);
   private readonly postService = inject(PostService);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
-  private postRequest?: Subscription;
-  protected readonly destination = signal<PostDestination>(postDestinations[0]);
-  protected readonly authService = inject(AuthService);
 
+  private postRequest?: Subscription;
+
+  protected readonly destination = signal<PostDestination>(postDestinations[0]);
   protected readonly posts = signal<PostResponse[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly errorMessage = signal<string | null>(null);
@@ -32,27 +33,28 @@ export class General implements OnInit {
   protected readonly postDeleted = signal(false);
 
   ngOnInit(): void {
-    this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data) => {
-      this.destination.set(data['destination']);
-      this.postCreated.set(this.route.snapshot.queryParamMap.get('created') === 'true');
-      this.postDeleted.set(this.route.snapshot.queryParamMap.get('deleted') === 'true');
-      this.loadPosts();
+    // Subscribe to route data and query parameters to load posts based on the destination and handle post creation/deletion flags.
+    this.route.data.pipe(
+      takeUntilDestroyed(this.destroyRef)).subscribe((data) => {
+        this.destination.set(data['destination']);
+        this.postCreated.set(this.route.snapshot.queryParamMap.get('created') === 'true');
+        this.postDeleted.set(this.route.snapshot.queryParamMap.get('deleted') === 'true');
+        this.loadPosts();
     });
   }
 
+  // Load posts based on the current destination and handle loading state and errors.
   protected loadPosts(): void {
     this.postRequest?.unsubscribe();
+
     this.posts.set([]);
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.postRequest = this.postService
-      .getPosts(this.destination().category, this.destination().postType)
-      .pipe(
+    this.postRequest = this.postService.getPosts(this.destination().category, this.destination().postType).pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
-      )
-      .subscribe({
+      ).subscribe({
         next: (posts) => this.posts.set(posts),
         error: () => this.errorMessage.set('We could not load the posts. Please try again.'),
       });

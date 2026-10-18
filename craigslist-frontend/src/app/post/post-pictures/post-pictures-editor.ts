@@ -84,13 +84,17 @@ export class PostPicturesEditor implements OnDestroy {
   readonly postId = input<string | null>(null);
   readonly pictureIds = input<readonly string[]>([]);
   readonly disabled = input(false);
+
   readonly changed = output<PostPictureDraft>();
+
   protected readonly additions = signal<PicturePreview[]>([]);
   protected readonly removedIds = signal<string[]>([]);
   protected readonly error = signal('');
+
   protected readonly existingPictures = computed(() =>
     this.pictureIds().filter((id) => !this.removedIds().includes(id)),
   );
+
   protected readonly count = computed(
     () => this.existingPictures().length + this.additions().length,
   );
@@ -101,13 +105,19 @@ export class PostPicturesEditor implements OnDestroy {
     input.value = '';
     this.addFiles(files);
   }
+
   protected addFiles(files: File[]): void {
-    if (this.disabled() || files.length === 0) return;
+    if (this.disabled() || files.length === 0) {
+      return;
+    }
+
     this.error.set('');
+
     if (this.count() + files.length > 5) {
       this.error.set('Use up to 5 pictures per post.');
       return;
     }
+
     if (
       files.some(
         (file) =>
@@ -119,31 +129,46 @@ export class PostPicturesEditor implements OnDestroy {
       this.error.set('Choose JPEG or PNG pictures up to 2 MB each.');
       return;
     }
+
     this.additions.update((current) => [
       ...current,
       ...files.map((file) => ({ file, url: URL.createObjectURL(file) })),
     ]);
+
     this.emitDraft();
   }
+
   protected removeExisting(id: string): void {
-    if (this.disabled()) return;
+    if (this.disabled()) {
+      return;
+    }
+
     this.removedIds.update((ids) => [...ids, id]);
+
     this.error.set('');
     this.emitDraft();
   }
+
   protected removeNew(picture: PicturePreview): void {
-    if (this.disabled()) return;
+    if (this.disabled()) {
+      return;
+    }
+
     URL.revokeObjectURL(picture.url);
+
     this.additions.update((pictures) => pictures.filter((item) => item !== picture));
+
     this.error.set('');
     this.emitDraft();
   }
+
   private emitDraft(): void {
     this.changed.emit({
       files: this.additions().map((picture) => picture.file),
       removedPictureIds: this.removedIds(),
     });
   }
+
   ngOnDestroy(): void {
     this.additions().forEach((picture) => URL.revokeObjectURL(picture.url));
   }

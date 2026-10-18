@@ -19,9 +19,8 @@ export class Login {
   private readonly router = inject(Router);
 
   protected readonly registered = this.route.snapshot.queryParamMap.get('registered') === 'true';
-  protected readonly returnUrl = accountReturnUrl(
-    this.route.snapshot.queryParamMap.get('returnUrl'),
-  );
+  protected readonly returnUrl = accountReturnUrl(this.route.snapshot.queryParamMap.get('returnUrl'));
+
   protected readonly isSubmitting = signal(false);
   protected readonly showPassword = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
@@ -31,6 +30,8 @@ export class Login {
     password: ['', Validators.required],
   });
 
+  // Submit handler for the login form.
+  // It validates the form, disables it during submission, and handles the response.
   protected submit(): void {
     this.errorMessage.set(null);
 
@@ -42,15 +43,13 @@ export class Login {
     this.isSubmitting.set(true);
     this.loginForm.disable();
 
-    this.authService
-      .login(this.loginForm.getRawValue())
-      .pipe(
+    // Call the AuthService to perform the login operation.
+    this.authService.login(this.loginForm.getRawValue()).pipe(
         finalize(() => {
           this.isSubmitting.set(false);
           this.loginForm.enable();
         }),
-      )
-      .subscribe({
+      ).subscribe({
         next: () => {
           void this.router.navigateByUrl(this.returnUrl);
         },
@@ -68,6 +67,7 @@ export class Login {
       });
   }
 
+  // Toggle the visibility of the password field.
   protected togglePasswordVisibility(): void {
     this.showPassword.update((visible) => !visible);
   }

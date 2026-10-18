@@ -14,13 +14,17 @@ import { DirectMessage, Mailbox, MessageService } from '../message.service';
   styleUrl: '../mailbox.scss',
 })
 export class MessageDetail implements OnInit {
-  private readonly service = inject(MessageService);
+  private readonly messageService = inject(MessageService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
+
   private readonly reload = new Subject<void>();
+
+  // The mailbox is passed as route data from the parent route, so we can access it directly from the ActivatedRoute snapshot.
   protected readonly mailbox: Mailbox = this.route.snapshot.data['mailbox'];
+
   protected readonly message = signal<DirectMessage | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly error = signal<string | null>(null);
@@ -29,17 +33,19 @@ export class MessageDetail implements OnInit {
   protected readonly deleteError = signal<string | null>(null);
 
   ngOnInit(): void {
-    combineLatest([this.route.paramMap, this.reload.pipe(startWith(undefined))])
-      .pipe(
+    // We use combineLatest here to listen to both route parameter changes and manual reloads.
+    // Whenever either of these emits, we fetch the message for the current messageId.
+    combineLatest([this.route.paramMap, this.reload.pipe(startWith(undefined))]).pipe(
         switchMap(([params]) => {
           this.message.set(null);
           this.error.set(null);
           this.isLoading.set(true);
           this.confirmingDelete.set(false);
-          return this.service.get(params.get('messageId') ?? '', this.mailbox).pipe(
+          // Get the messageId from the route parameters and fetch the message from the service.
+          return this.messageService.get(params.get('messageId') ?? '', this.mailbox).pipe(
             switchMap((message) =>
               this.mailbox === 'INBOX' && !message.readAt
-                ? this.service.markRead(message.id)
+                ? this.messageService.markRead(message.id)
                 : of(message),
             ),
             catchError((error: HttpErrorResponse) => {
@@ -55,8 +61,7 @@ export class MessageDetail implements OnInit {
           );
         }),
         takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe((message) => {
+      ).subscribe((message) => {
         this.message.set(message);
         this.isLoading.set(false);
       });
@@ -65,6 +70,7 @@ export class MessageDetail implements OnInit {
   protected retry(): void {
     this.reload.next();
   }
+
   protected confirmDelete(): void {
     this.confirmingDelete.set(true);
     this.deleteError.set(null);
@@ -72,22 +78,26 @@ export class MessageDetail implements OnInit {
       this.element.nativeElement.querySelector<HTMLButtonElement>('.cancel-delete')?.focus(),
     );
   }
+
   protected cancelDelete(): void {
     this.confirmingDelete.set(false);
     this.element.nativeElement.querySelector<HTMLButtonElement>('.delete-trigger')?.focus();
   }
+
   protected deleteMessage(): void {
     const message = this.message();
-    if (!message || this.isDeleting()) return;
+
+    if (!message || this.isDeleting()) {
+      return;
+    }
+
     this.isDeleting.set(true);
     this.deleteError.set(null);
-    this.service
-      .delete(message.id, this.mailbox)
-      .pipe(
+
+    this.messageService.delete(message.id, this.mailbox).pipe(
         finalize(() => this.isDeleting.set(false)),
         takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe({
+      ).subscribe({
         next: () =>
           void this.router.navigate(['/inbox'], {
             queryParams: { folder: this.mailbox === 'SENT' ? 'sent' : null, deleted: true },

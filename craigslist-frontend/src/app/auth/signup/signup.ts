@@ -19,8 +19,10 @@ export class Signup {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+
   protected readonly submitting = signal(false);
   protected readonly errorMessage = signal('');
+
   protected readonly signupForm = this.formBuilder.nonNullable.group({
     username: [
       '',
@@ -35,42 +37,54 @@ export class Signup {
     password: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(72)]],
     confirmPassword: ['', Validators.required],
   });
+
+  // The return URL to redirect to after successful signup.
   protected readonly returnUrl = accountReturnUrl(
     this.route.snapshot.queryParamMap.get('returnUrl'),
   );
 
+  // Submit handler for the signup form.
   protected submit(): void {
-    if (this.submitting()) return;
+    if (this.submitting()) {
+      return;
+    }
+
     this.errorMessage.set('');
+
     const values = this.signupForm.getRawValue();
+
+    // Trim whitespace from username and privateEmail fields.
     this.signupForm.patchValue({
       username: values.username.trim(),
       privateEmail: values.privateEmail.trim(),
     });
+
     if (this.signupForm.invalid) {
       this.signupForm.markAllAsTouched();
       return;
     }
+
     if (values.password !== values.confirmPassword) {
       this.errorMessage.set('The passwords do not match.');
       return;
     }
+
     if (new TextEncoder().encode(values.password).length > 72) {
       this.errorMessage.set('Your password is too long. Use fewer characters.');
       return;
     }
+
     this.submitting.set(true);
     this.signupForm.disable();
-    this.auth
-      .signup(this.signupForm.getRawValue())
-      .pipe(
+
+    // Call the signup method of the AuthService and handle the response.
+    this.auth.signup(this.signupForm.getRawValue()).pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
           this.submitting.set(false);
           this.signupForm.enable();
         }),
-      )
-      .subscribe({
+      ).subscribe({
         next: () => {
           this.signupForm.reset();
           void this.router.navigate(['/login'], {

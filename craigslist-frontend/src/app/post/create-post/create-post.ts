@@ -16,23 +16,27 @@ import { PostService } from '../post.service';
   styleUrl: './create-post.scss',
 })
 export class CreatePost {
+  private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly postService = inject(PostService);
   private readonly router = inject(Router);
-
   private readonly route = inject(ActivatedRoute);
+
   protected readonly fromMyPosts = this.route.snapshot.data['chooseDestination'] === true;
+
   protected readonly destination = signal<PostDestination | null>(
     this.fromMyPosts ? null : (this.route.snapshot.data['destination'] as PostDestination),
   );
-  protected readonly destinationError = signal(false);
-  private readonly destinationPicker = viewChild(DestinationPicker);
-
-  protected readonly authService = inject(AuthService);
-  protected readonly isSubmitting = signal(false);
-  protected readonly errorMessage = signal<string | null>(null);
 
   protected readonly pictureDraft = signal<PostPictureDraft>({ files: [], removedPictureIds: [] });
+  protected readonly isSubmitting = signal(false);
+  protected readonly destinationError = signal(false);
+  protected readonly errorMessage = signal<string | null>(null);
+
+  // Use viewChild to get a reference to the DestinationPicker component.
+  // We can open it when the user tries to submit without selecting a destination.
+  private readonly destinationPicker = viewChild(DestinationPicker);
+
   protected readonly postForm = this.formBuilder.nonNullable.group({
     title: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(200)]],
     body: ['', [Validators.required, Validators.pattern(/\S/)]],
@@ -40,12 +44,17 @@ export class CreatePost {
     advertisement: [false],
   });
 
+  // Submit handler for the form.
   protected submit(): void {
     this.errorMessage.set(null);
 
-    if (this.isSubmitting()) return;
+    if (this.isSubmitting()) {
+      return;
+    }
+
     const destination = this.destination();
     this.destinationError.set(!destination);
+
     if (!destination) {
       this.destinationPicker()?.open();
       return;
@@ -62,9 +71,8 @@ export class CreatePost {
     this.isSubmitting.set(true);
     this.postForm.disable();
 
-    this.postService
-      .createPost(
-        {
+    // Call the post service to create the post.
+    this.postService.createPost({
           title: values.title.trim(),
           body: values.body.trim(),
           category: destination.category,
@@ -72,15 +80,13 @@ export class CreatePost {
           location: location || null,
           advertisement: values.advertisement,
         },
-        this.pictureDraft().files,
-      )
-      .pipe(
+      this.pictureDraft().files,
+      ).pipe(
         finalize(() => {
           this.isSubmitting.set(false);
           this.postForm.enable();
         }),
-      )
-      .subscribe({
+      ).subscribe({
         next: () => {
           void this.router.navigate([destination.path], {
             queryParams: { created: 'true' },

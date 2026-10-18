@@ -13,12 +13,13 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class PostDestinationTests {
-    @Test void eachCategoryHasExactlyTwoValidTypesAndInvalidPairsFailValidation() {
+    @Test void eachCategoryHasItsExpectedValidTypesAndInvalidPairsFailValidation() {
         assertThat(PostCategory.values()).hasSize(6);
         try (var factory = Validation.buildDefaultValidatorFactory()) {
             var validator = factory.getValidator();
             for (PostCategory category : PostCategory.values()) {
-                assertThat(Arrays.stream(PostType.values()).filter(category::supports)).hasSize(2);
+                int expectedTypeCount = category == PostCategory.COMMUNITY ? 3 : 2;
+                assertThat(Arrays.stream(PostType.values()).filter(category::supports)).hasSize(expectedTypeCount);
                 for (PostType type : PostType.values()) {
                     var request = new PostRequest("Title", "Body", category, type, null, false);
                     assertThat(validator.validate(request).isEmpty()).isEqualTo(category.supports(type));

@@ -26,10 +26,13 @@ export class Inbox implements OnInit {
   protected readonly notice = signal('');
 
   ngOnInit(): void {
-    combineLatest([this.route.queryParamMap, this.reload.pipe(startWith(undefined))])
-      .pipe(
+    // We use combineLatest here to listen to both query parameter changes and manual reloads.
+    // Whenever either of these emits, we fetch the messages for the current mailbox.
+    combineLatest([this.route.queryParamMap, this.reload.pipe(startWith(undefined))]).pipe(
         switchMap(([params]) => {
           this.mailbox.set(params.get('folder') === 'sent' ? 'SENT' : 'INBOX');
+
+          // Set the notice message based on query parameters.
           this.notice.set(
             params.get('sent') === 'true'
               ? 'Your message was sent.'
@@ -38,9 +41,11 @@ export class Inbox implements OnInit {
                   (this.mailbox() === 'INBOX' ? 'inbox.' : 'sent messages.')
                 : '',
           );
+
           this.isLoading.set(true);
           this.messages.set([]);
           this.error.set(null);
+
           return this.service.list(this.mailbox()).pipe(
             catchError((error: HttpErrorResponse) => {
               this.error.set(
@@ -53,13 +58,13 @@ export class Inbox implements OnInit {
           );
         }),
         takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe((messages) => {
+      ).subscribe((messages) => {
         this.messages.set(messages);
         this.isLoading.set(false);
       });
   }
 
+  // Refresh the message list.
   protected refresh(): void {
     this.reload.next();
   }

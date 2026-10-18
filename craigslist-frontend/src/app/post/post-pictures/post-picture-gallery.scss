@@ -9,7 +9,7 @@ button {
   cursor: pointer;
 }
 button:focus-visible {
-  outline: 3px solid #8c5dad;
+  outline: 3px solid #a9c5ec;
   outline-offset: 3px;
 }
 .main-picture {
@@ -18,7 +18,7 @@ button:focus-visible {
   padding: 0;
   border: 0;
   background: #fff;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: zoom-in;
 }
 .main-picture img {
@@ -26,7 +26,7 @@ button:focus-visible {
   width: 100%;
   max-height: 440px;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 4px;
 }
 .thumbnails {
   display: flex;
@@ -37,11 +37,11 @@ button:focus-visible {
 .thumbnails button {
   padding: 3px;
   border: 2px solid transparent;
-  border-radius: 6px;
+  border-radius: 4px;
   background: #fff;
 }
 .thumbnails button[aria-pressed='true'] {
-  border-color: #642f83;
+  border-color: #2457a7;
 }
 .thumbnails img {
   display: block;
@@ -51,7 +51,7 @@ button:focus-visible {
 }
 .picture-count {
   margin: 10px 0 0;
-  color: #746d77;
+  color: #687482;
   font-size: 0.85rem;
 }
 dialog {
@@ -59,11 +59,11 @@ dialog {
   max-height: calc(100dvh - 48px);
   padding: 16px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 4px;
   background: white;
 }
 dialog::backdrop {
-  background: #17111de0;
+  background: #182433e0;
 }
 .viewer-header,
 .viewer-navigation {
@@ -71,14 +71,14 @@ dialog::backdrop {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  color: #4e4751;
+  color: #4b5663;
 }
 dialog button {
   padding: 10px 14px;
   border: 1px solid #a7a0aa;
-  border-radius: 7px;
+  border-radius: 4px;
   background: #fff;
-  color: #5f2e7d;
+  color: #2457a7;
   font-weight: 700;
 }
 .enlarged {

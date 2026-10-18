@@ -39,13 +39,14 @@ import { PostService } from '../post.service';
   styleUrl: './post-detail.scss',
 })
 export class PostDetail implements OnInit {
+  protected readonly authService = inject(AuthService);
+  private readonly postService = inject(PostService);
+  private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
-  private postRequest?: Subscription;
-  private readonly router = inject(Router);
-  private readonly postService = inject(PostService);
 
-  protected readonly authService = inject(AuthService);
+  private postRequest?: Subscription;
+
   protected readonly post = signal<PostResponse | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly errorMessage = signal<string | null>(null);
@@ -57,6 +58,7 @@ export class PostDetail implements OnInit {
   protected readonly isConfirmingDelete = signal(false);
   protected readonly isDeleting = signal(false);
   protected readonly deleteError = signal<string | null>(null);
+
   protected readonly destination = computed(() =>
     this.post() ? findPostDestination(this.post()!) : undefined,
   );
@@ -85,7 +87,9 @@ export class PostDetail implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+    this.route.paramMap.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
       this.publicationMessage.set('');
       this.publicationError.set('');
       this.wasUpdated.set(this.route.snapshot.queryParamMap.get('updated') === 'true');
@@ -98,7 +102,9 @@ export class PostDetail implements OnInit {
 
   protected loadPost(): void {
     this.postRequest?.unsubscribe();
+
     this.post.set(null);
+
     const postId = this.route.snapshot.paramMap.get('postId');
 
     if (!postId) {
@@ -110,13 +116,10 @@ export class PostDetail implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.postRequest = this.postService
-      .getPost(postId)
-      .pipe(
+    this.postRequest = this.postService.getPost(postId).pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
-      )
-      .subscribe({
+      ).subscribe({
         next: (post) => this.post.set(post),
         error: (error: HttpErrorResponse) => {
           this.errorMessage.set(
@@ -130,17 +133,20 @@ export class PostDetail implements OnInit {
 
   protected changePublication(): void {
     const post = this.post();
-    if (!post || !this.isOwner() || this.changingPublication()) return;
+
+    if (!post || !this.isOwner() || this.changingPublication()) {
+      return;
+    }
+
     this.closePostMenu();
+
     this.publicationError.set('');
     this.changingPublication.set(true);
-    this.postService
-      .changePublication(post.id, post.status !== 'PUBLISHED')
-      .pipe(
+
+    this.postService.changePublication(post.id, post.status !== 'PUBLISHED').pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.changingPublication.set(false)),
-      )
-      .subscribe({
+      ).subscribe({
         next: (updated) => {
           if (this.post()?.id !== updated.id) return;
           this.post.set(updated);
@@ -183,24 +189,23 @@ export class PostDetail implements OnInit {
     this.isDeleting.set(true);
     this.deleteError.set(null);
 
-    this.postService
-      .deletePost(post.id)
-      .pipe(finalize(() => this.isDeleting.set(false)))
-      .subscribe({
-        next: () => {
-          void this.router.navigate([this.destination()?.path ?? '/'], {
-            queryParams: { deleted: 'true' },
-          });
-        },
-        error: (error: HttpErrorResponse) => {
-          if (error.status === 401 || error.status === 403) {
-            this.deleteError.set('You must be signed in as the post owner to delete it.');
-          } else if (error.status === 404) {
-            this.deleteError.set('This post could not be found.');
-          } else {
-            this.deleteError.set('We could not delete this post. Please try again.');
-          }
-        },
-      });
+    this.postService.deletePost(post.id).pipe(
+      finalize(() => this.isDeleting.set(false))
+    ).subscribe({
+      next: () => {
+        void this.router.navigate([this.destination()?.path ?? '/'], {
+          queryParams: { deleted: 'true' },
+        });
+      },
+      error: (error: HttpErrorResponse) => {
+        if (error.status === 401 || error.status === 403) {
+          this.deleteError.set('You must be signed in as the post owner to delete it.');
+        } else if (error.status === 404) {
+          this.deleteError.set('This post could not be found.');
+        } else {
+          this.deleteError.set('We could not delete this post. Please try again.');
+        }
+      },
+    });
   }
 }

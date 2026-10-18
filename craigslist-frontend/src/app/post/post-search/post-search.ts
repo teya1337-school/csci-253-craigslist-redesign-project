@@ -47,26 +47,33 @@ interface SearchState {
   styleUrl: './post-search.scss',
 })
 export class PostSearch implements OnInit {
+  private readonly service = inject(PostService);
+  private readonly router = inject(Router);
   protected readonly destinationFor = findPostDestination;
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
-  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly isOpen = signal(false);
   protected readonly activeIndex = signal(-1);
-  protected readonly suggestions = computed(() => this.state().posts.slice(0, 8));
-  protected readonly dropdownVisible = computed(
-    () => this.isOpen() && this.state().status !== 'idle',
-  );
-  private readonly service = inject(PostService);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly retry = new Subject<void>();
-  private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
-  protected readonly search = new FormControl('', { nonNullable: true });
+
   protected readonly state = signal<SearchState>({
     status: 'idle',
     query: '',
     posts: [],
     total: 0,
   });
+
+  protected readonly suggestions = computed(() => this.state().posts.slice(0, 8));
+
+  protected readonly dropdownVisible = computed(
+    () => this.isOpen() && this.state().status !== 'idle',
+  );
+
+  private readonly retry = new Subject<void>();
+
+  private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
+
+  protected readonly search = new FormControl('', { nonNullable: true });
 
   ngOnInit(): void {
     const queries = merge(
@@ -92,8 +99,10 @@ export class PostSearch implements OnInit {
         }),
         debounceTime(300),
         switchMap((query) => {
-          if (query.length < 2)
+          if (query.length < 2) {
             return of<SearchState>({ status: 'idle', query, posts: [], total: 0 });
+          }
+
           return this.service.searchPosts(query).pipe(
             map((result) => ({ status: 'success', query, ...result }) as SearchState),
             catchError(() => of<SearchState>({ status: 'error', query, posts: [], total: 0 })),
@@ -103,21 +112,20 @@ export class PostSearch implements OnInit {
           );
         }),
         takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe((state) => this.state.set(state));
+      ).subscribe((state) => this.state.set(state));
 
-    this.router.events
-      .pipe(
+    this.router.events.pipe(
         filter((event) => event instanceof NavigationEnd),
         takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe(() => this.resetSearch());
+      ).subscribe(() => this.resetSearch());
   }
 
   private resetSearch(): void {
     this.search.setValue('');
     this.close();
+
     const focused = this.element.nativeElement.ownerDocument.activeElement;
+
     if (focused instanceof HTMLElement && this.element.nativeElement.contains(focused)) {
       focused.blur();
     }
@@ -127,9 +135,11 @@ export class PostSearch implements OnInit {
     this.search.setValue('');
     this.searchInput()?.nativeElement.focus();
   }
+
   protected retrySearch(): void {
     this.retry.next();
   }
+
   protected open(): void {
     this.isOpen.set(this.search.value.trim().length >= 2);
   }
@@ -149,18 +159,29 @@ export class PostSearch implements OnInit {
   }
 
   protected handleKeydown(event: KeyboardEvent): void {
-    if (event.isComposing) return;
+    if (event.isComposing) {
+      return;
+    }
+
     if (event.key === 'Escape') {
       event.preventDefault();
       this.close();
       return;
     }
+
     const posts = this.suggestions();
+
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      if (posts.length === 0) return;
+      if (posts.length === 0) {
+        return;
+      }
+
       event.preventDefault();
+
       this.isOpen.set(true);
+
       const index = this.activeIndex();
+
       this.activeIndex.set(
         index < 0
           ? event.key === 'ArrowDown'
@@ -168,6 +189,7 @@ export class PostSearch implements OnInit {
             : posts.length - 1
           : (index + (event.key === 'ArrowDown' ? 1 : -1) + posts.length) % posts.length,
       );
+
       setTimeout(() =>
         this.element.nativeElement
           .querySelector<HTMLElement>('.suggestion.active')
@@ -181,17 +203,20 @@ export class PostSearch implements OnInit {
 
   protected choose(post: PostResponse): void {
     this.close();
-    if (
-      this.router.isActive(this.router.createUrlTree(['/posts', post.id]), {
-        paths: 'exact',
-        queryParams: 'ignored',
-        fragment: 'ignored',
-        matrixParams: 'ignored',
-      })
-    ) {
+
+    const isPostActive = this.router.isActive(this.router.createUrlTree(['/posts', post.id]), {
+      paths: 'exact',
+      queryParams: 'ignored',
+      fragment: 'ignored',
+      matrixParams: 'ignored',
+    });
+
+    // No need to navigate if the post is already active, just reset the search.
+    if (isPostActive) {
       this.resetSearch();
       return;
     }
+
     void this.router.navigate(['/posts', post.id]);
   }
 }

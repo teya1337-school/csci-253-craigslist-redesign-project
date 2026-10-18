@@ -27,38 +27,25 @@ import { CommentResponse } from '../models/comment-response';
   styleUrl: './post-comments.scss',
 })
 export class PostComments implements OnInit {
+  protected readonly authService = inject(AuthService);
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
-  private readonly composerInput = viewChild<ElementRef<HTMLTextAreaElement>>('composerInput');
-  private replyTrigger?: HTMLElement;
-  protected readonly replyTarget = signal<CommentResponse | null>(null);
-  protected readonly statusMessage = signal('');
-
   private readonly formBuilder = inject(FormBuilder);
   private readonly commentService = inject(CommentService);
 
+  private readonly composerInput = viewChild<ElementRef<HTMLTextAreaElement>>('composerInput');
+
+  private replyTrigger?: HTMLElement;
+
+  protected readonly replyTarget = signal<CommentResponse | null>(null);
+  protected readonly statusMessage = signal('');
+
   readonly postId = input.required<string>();
 
-  protected readonly authService = inject(AuthService);
   protected readonly comments = signal<CommentResponse[]>([]);
   protected readonly commentCount = computed(
     () => this.comments().filter((comment) => !comment.deleted).length,
   );
-  protected readonly threadedComments = computed(() => {
-    const children = new Map<string | null, CommentResponse[]>();
-    for (const comment of this.comments()) {
-      const key = comment.parentId ?? null;
-      children.set(key, [...(children.get(key) ?? []), comment]);
-    }
-    const rows: { comment: CommentResponse; depth: number; parentName: string | null }[] = [];
-    const visit = (parentId: string | null, depth: number, parentName: string | null) => {
-      for (const comment of children.get(parentId) ?? []) {
-        rows.push({ comment, depth, parentName });
-        visit(comment.id, depth + 1, comment.username);
-      }
-    };
-    visit(null, 0, null);
-    return rows;
-  });
+
   protected readonly isLoading = signal(true);
   protected readonly loadError = signal<string | null>(null);
   protected readonly isFormOpen = signal(false);
@@ -71,19 +58,40 @@ export class PostComments implements OnInit {
   protected readonly commentActionError = signal<string | null>(null);
   private openMenuTrigger?: HTMLButtonElement;
 
-  protected readonly commentForm = this.formBuilder.nonNullable.group({
-    content: ['', [Validators.required, Validators.pattern(/\S/)]],
+  // Organize comments into a threaded structure for display.
+  protected readonly threadedComments = computed(() => {
+    // Create a map of parentId to its child comments for easy lookup.
+    const children = new Map<string | null, CommentResponse[]>();
+
+    // Populate the map with comments, grouping them by their parentId.
+    for (const comment of this.comments()) {
+      const key = comment.parentId ?? null;
+      children.set(key, [...(children.get(key) ?? []), comment]);
+    }
+
+    // Create a flat list of comments with depth information for rendering.
+    const rows: { comment: CommentResponse; depth: number; parentName: string | null }[] = [];
+
+    // Recursively visit comments and their children to build a flat list with depth information.
+    const visit = (parentId: string | null, depth: number, parentName: string | null) => {
+      for (const comment of children.get(parentId) ?? []) {
+        rows.push({ comment, depth, parentName });
+        visit(comment.id, depth + 1, comment.username);
+      }
+    };
+
+    visit(null, 0, null);
+
+    return rows;
   });
 
-  protected readonly editCommentForm = this.formBuilder.nonNullable.group({
-    content: ['', [Validators.required, Validators.pattern(/\S/)]],
-  });
-
+  // Close the comment menu when clicking outside of it.
   @HostListener('document:click')
   protected closeCommentMenuWhenClickingOutside(): void {
     this.openCommentMenuId.set(null);
   }
 
+  // Close the comment menu when pressing the Escape key.
   @HostListener('document:keydown.escape')
   protected closeCommentMenuWithEscape(): void {
     if (this.openCommentMenuId()) {
@@ -92,23 +100,33 @@ export class PostComments implements OnInit {
     }
   }
 
+  protected readonly commentForm = this.formBuilder.nonNullable.group({
+    content: ['', [Validators.required, Validators.pattern(/\S/)]],
+  });
+
+  protected readonly editCommentForm = this.formBuilder.nonNullable.group({
+    content: ['', [Validators.required, Validators.pattern(/\S/)]],
+  });
+
   ngOnInit(): void {
     this.loadComments();
   }
 
+  // Load comments for the given postId and handle loading state and errors.
   protected loadComments(): void {
     this.isLoading.set(true);
     this.loadError.set(null);
 
-    this.commentService
-      .getComments(this.postId())
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: (comments) => this.comments.set(comments),
-        error: () => this.loadError.set('We could not load the comments. Please try again.'),
-      });
+    // Fetch comments from the CommentService and update the comments signal.
+    this.commentService.getComments(this.postId()).pipe(
+      finalize(() => this.isLoading.set(false))
+    ).subscribe({
+      next: (comments) => this.comments.set(comments),
+      error: () => this.loadError.set('We could not load the comments. Please try again.'),
+    });
   }
 
+  // Open the comment form for creating a new comment.
   protected openForm(): void {
     this.submitError.set(null);
     this.replyTarget.set(null);
@@ -116,6 +134,7 @@ export class PostComments implements OnInit {
     this.focusComposer();
   }
 
+  // Open the comment form for replying to a specific comment.
   protected startReply(comment: CommentResponse, event: Event): void {
     this.replyTrigger = event.currentTarget as HTMLElement;
     this.replyTarget.set(comment);
@@ -124,16 +143,19 @@ export class PostComments implements OnInit {
     this.focusComposer();
   }
 
+  // Focus on a specific comment by its ID.
   protected focusComment(commentId: string | null): void {
     if (commentId) {
       this.element.nativeElement.querySelector<HTMLElement>('#comment-' + commentId)?.focus();
     }
   }
 
+  // Focus on the comment composer input after a short delay to ensure it's rendered.
   private focusComposer(): void {
     setTimeout(() => this.composerInput()?.nativeElement.focus());
   }
 
+  // Cancel the comment form, reset its state, and return focus to the reply trigger if applicable.
   protected cancelComment(): void {
     this.commentForm.reset();
     this.submitError.set(null);
@@ -142,10 +164,13 @@ export class PostComments implements OnInit {
     this.replyTrigger?.focus();
   }
 
+  // Submit a new comment or reply, handling form validation, submission state, and errors.
   protected submitComment(): void {
     this.submitError.set(null);
 
-    if (this.isSubmitting() || !this.authService.isAuthenticated()) return;
+    if (this.isSubmitting() || !this.authService.isAuthenticated()) {
+      return;
+    }
 
     if (this.commentForm.invalid) {
       this.commentForm.markAllAsTouched();
@@ -156,15 +181,13 @@ export class PostComments implements OnInit {
     this.isSubmitting.set(true);
     this.commentForm.disable();
 
-    this.commentService
-      .createComment(this.postId(), { content, parentId: this.replyTarget()?.id })
-      .pipe(
+    // Call the CommentService to create a new comment, passing the postId and optional parentId for replies.
+    this.commentService.createComment(this.postId(), { content, parentId: this.replyTarget()?.id }).pipe(
         finalize(() => {
           this.isSubmitting.set(false);
           this.commentForm.enable();
         }),
-      )
-      .subscribe({
+      ).subscribe({
         next: (comment) => {
           this.comments.update((comments) => [...comments, comment]);
           this.commentForm.reset();
@@ -191,16 +214,19 @@ export class PostComments implements OnInit {
       });
   }
 
+  // Check if the current user owns the given comment, considering deleted comments.
   protected ownsComment(comment: CommentResponse): boolean {
     return !comment.deleted && this.authService.currentUser()?.id === comment.userId;
   }
 
+  // Toggle the visibility of the comment menu for a specific comment, ensuring only one menu is open at a time.
   protected toggleCommentMenu(commentId: string, event: Event): void {
     event.stopPropagation();
     this.openMenuTrigger = event.currentTarget as HTMLButtonElement;
     this.openCommentMenuId.update((openId) => (openId === commentId ? null : commentId));
   }
 
+  // Start editing a comment by setting the editingCommentId and populating the edit form with the comment's content.
   protected startEditing(comment: CommentResponse): void {
     this.openCommentMenuId.set(null);
     this.pendingDeleteCommentId.set(null);
@@ -209,12 +235,14 @@ export class PostComments implements OnInit {
     this.editCommentForm.setValue({ content: comment.content });
   }
 
+  // Cancel the comment editing process, reset the form, and clear the editing state.
   protected cancelEditing(): void {
     this.editCommentForm.reset();
     this.commentActionError.set(null);
     this.editingCommentId.set(null);
   }
 
+  // Save the edited comment, handling form validation, submission state, and errors.
   protected saveComment(comment: CommentResponse): void {
     this.commentActionError.set(null);
 
@@ -227,15 +255,13 @@ export class PostComments implements OnInit {
     this.isManagingComment.set(true);
     this.editCommentForm.disable();
 
-    this.commentService
-      .updateComment(this.postId(), comment.id, { content })
-      .pipe(
+    // Call the CommentService to update the comment, passing the postId, commentId, and new content.
+    this.commentService.updateComment(this.postId(), comment.id, { content }).pipe(
         finalize(() => {
           this.isManagingComment.set(false);
           this.editCommentForm.enable();
         }),
-      )
-      .subscribe({
+      ).subscribe({
         next: (updatedComment) => {
           this.comments.update((comments) =>
             comments.map((existingComment) =>
@@ -249,6 +275,7 @@ export class PostComments implements OnInit {
       });
   }
 
+  // Show a confirmation dialog for deleting a comment, setting the pendingDeleteCommentId to the comment's ID.
   protected showDeleteConfirmation(comment: CommentResponse): void {
     this.openCommentMenuId.set(null);
     this.editingCommentId.set(null);
@@ -256,11 +283,13 @@ export class PostComments implements OnInit {
     this.pendingDeleteCommentId.set(comment.id);
   }
 
+  // Cancel the delete confirmation, clearing the pending delete state.
   protected cancelDelete(): void {
     this.commentActionError.set(null);
     this.pendingDeleteCommentId.set(null);
   }
 
+  // Delete a comment if the current user owns it, handling submission state and errors.
   protected deleteComment(comment: CommentResponse): void {
     if (!this.ownsComment(comment)) {
       return;
@@ -269,9 +298,9 @@ export class PostComments implements OnInit {
     this.isManagingComment.set(true);
     this.commentActionError.set(null);
 
-    this.commentService
-      .deleteComment(this.postId(), comment.id)
-      .pipe(finalize(() => this.isManagingComment.set(false)))
+    // Call the CommentService to delete the comment, passing the postId and commentId.
+    this.commentService.deleteComment(this.postId(), comment.id).pipe(
+      finalize(() => this.isManagingComment.set(false)))
       .subscribe({
         next: () => {
           this.comments.update((comments) =>
@@ -293,6 +322,7 @@ export class PostComments implements OnInit {
       });
   }
 
+  // Set an appropriate error message based on the HTTP error response and the action being performed (save or delete).
   private setCommentActionError(error: HttpErrorResponse, action: 'save' | 'delete'): void {
     if (error.status === 401 || error.status === 403) {
       this.commentActionError.set('You must be signed in as the comment author to manage it.');

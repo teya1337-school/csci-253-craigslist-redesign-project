@@ -94,51 +94,68 @@ import { PostDestination, postDestinations } from '../post-destinations';
 })
 export class DestinationPicker {
   readonly destination = model<PostDestination | null>(null);
+
   readonly showError = input(false);
   readonly disabled = input(false);
+
   protected readonly isOpen = signal(false);
   protected readonly category = signal('');
   protected readonly postType = signal('');
+
   protected readonly categories = postDestinations.filter(
     (option, index, all) => all.findIndex((item) => item.category === option.category) === index,
   );
+
   protected readonly types = computed(() =>
     postDestinations.filter((option) => option.category === this.category()),
   );
+
   protected readonly canApply = computed(() =>
     postDestinations.some(
       (option) => option.category === this.category() && option.postType === this.postType(),
     ),
   );
+
   private readonly trigger = viewChild<ElementRef<HTMLButtonElement>>('trigger');
   private readonly categorySelect = viewChild<ElementRef<HTMLSelectElement>>('categorySelect');
 
+  // Focus the category select when the picker is opened, and focus the trigger when the picker is closed.
   open(): void {
     this.category.set(this.destination()?.category ?? '');
     this.postType.set(this.destination()?.postType ?? '');
     this.isOpen.set(true);
+
     setTimeout(() => this.categorySelect()?.nativeElement.focus());
   }
 
+  // Toggle the picker open or closed.
   protected toggle(): void {
     this.isOpen() ? this.close() : this.open();
   }
 
+  // Change the category and reset the post type.
   protected changeCategory(category: string): void {
     this.category.set(category);
     this.postType.set('');
   }
 
+  // Close the picker and focus the trigger button.
   protected close(): void {
     this.isOpen.set(false);
     this.trigger()?.nativeElement.focus();
   }
 
+  // Apply the selected destination.
   protected apply(): void {
     const option = postDestinations.find(
       (item) => item.category === this.category() && item.postType === this.postType(),
     );
-    if (!option) return;
+
+    if (!option) {
+      return;
+    }
+
+    // Set the destination and close the picker.
     this.destination.set(option);
     this.close();
   }

@@ -3,19 +3,19 @@
     <nav class="breadcrumbs" aria-label="Breadcrumb">
       <a routerLink="/">Home</a>
       <span aria-hidden="true">/</span>
-      <a routerLink="/community">Community</a>
+      <a [routerLink]="destination().categoryPath">{{ destination().categoryLabel }}</a>
       <span aria-hidden="true">/</span>
-      <span aria-current="page">General</span>
+      <span aria-current="page">{{ destination().typeLabel }}</span>
     </nav>
 
     <header class="page-heading">
       <div>
-        <p class="eyebrow">Community</p>
-        <h1>General</h1>
-        <p>Everyday local conversations, questions, and shared information.</p>
+        <p class="eyebrow">{{ destination().categoryLabel }}</p>
+        <h1>{{ destination().typeLabel }}</h1>
+        <p>{{ destination().description }}</p>
       </div>
       @if (authService.isAuthenticated()) {
-        <a class="create-button" routerLink="/community/general/new">Create post</a>
+        <a class="create-button" [routerLink]="destination().path + '/new'">Create post</a>
       }
     </header>
 
@@ -27,12 +27,12 @@
 
     <section class="discussion-section" aria-labelledby="discussions-heading">
       <div class="section-heading">
-        <h2 id="discussions-heading">Discussions</h2>
+        <h2 id="discussions-heading">Posts</h2>
         <span>Newest first</span>
       </div>
 
       @if (isLoading()) {
-        <div class="message-state" role="status">Loading discussions…</div>
+        <div class="message-state" role="status">Loading posts…</div>
       } @else if (errorMessage()) {
         <div class="message-state error-state" role="alert">
           <p>{{ errorMessage() }}</p>
@@ -46,8 +46,8 @@
             ></path>
             <path d="M16 19h12M16 25h8"></path>
           </svg>
-          <h3>No discussions yet</h3>
-          <p>Be the first person to start a General community discussion.</p>
+          <h3>No posts yet</h3>
+          <p>Be the first to post in {{ destination().typeLabel }}.</p>
         </div>
       } @else {
         <div class="post-list">

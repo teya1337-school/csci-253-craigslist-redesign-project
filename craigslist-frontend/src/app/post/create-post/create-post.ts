@@ -1,5 +1,5 @@
 import { DestinationPicker } from '../destination-picker/destination-picker';
-import { PostDestination, postDestinations } from '../post-destinations';
+import { PostDestination } from '../post-destinations';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal, viewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -22,7 +22,7 @@ export class CreatePost {
   private readonly route = inject(ActivatedRoute);
   protected readonly fromMyPosts = this.route.snapshot.data['chooseDestination'] === true;
   protected readonly destination = signal<PostDestination | null>(
-    this.fromMyPosts ? null : postDestinations[0],
+    this.fromMyPosts ? null : (this.route.snapshot.data['destination'] as PostDestination),
   );
   protected readonly destinationError = signal(false);
   private readonly destinationPicker = viewChild(DestinationPicker);

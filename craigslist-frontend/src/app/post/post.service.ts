@@ -1,15 +1,15 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { PostRequest } from './models/post-request';
+import { PostCategory, PostType, PostRequest } from './models/post-request';
 import { PostResponse } from './models/post-response';
 
 @Injectable({ providedIn: 'root' })
 export class PostService {
   private readonly http = inject(HttpClient);
 
-  getGeneralPosts(): Observable<PostResponse[]> {
-    const params = new HttpParams().set('category', 'COMMUNITY').set('postType', 'GENERAL');
+  getPosts(category: PostCategory, postType: PostType): Observable<PostResponse[]> {
+    const params = new HttpParams().set('category', category).set('postType', postType);
     return this.http.get<PostResponse[]>('/api/posts', { params });
   }
 

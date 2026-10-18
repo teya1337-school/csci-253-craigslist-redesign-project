@@ -1,3 +1,4 @@
+import { postCategories, postDestinations } from './post/post-destinations';
 import { Inbox } from './message/inbox/inbox';
 import { MessageDetail } from './message/message-detail/message-detail';
 import { ComposeMessage } from './message/compose-message/compose-message';
@@ -17,18 +18,27 @@ import { PostDetail } from './post/post-detail/post-detail';
 
 export const routes: Routes = [
   { path: '', component: Home, title: 'Home | Fresno Exchange' },
-  { path: 'community', component: Community, title: 'Community | Fresno Exchange' },
-  {
-    path: 'community/general',
-    component: General,
-    title: 'General Community | Fresno Exchange',
-  },
-  {
-    path: 'community/general/new',
-    component: CreatePost,
-    canActivate: [authGuard],
-    title: 'Create Post | Fresno Exchange',
-  },
+  ...postCategories.map((category) => ({
+    path: category.path.slice(1),
+    component: Community,
+    data: { category },
+    title: `${category.label} | Fresno Exchange`,
+  })),
+  ...postDestinations.flatMap((destination) => [
+    {
+      path: destination.path.slice(1),
+      component: General,
+      data: { destination },
+      title: `${destination.typeLabel} | ${destination.categoryLabel} | Fresno Exchange`,
+    },
+    {
+      path: `${destination.path.slice(1)}/new`,
+      component: CreatePost,
+      canActivate: [authGuard],
+      data: { destination },
+      title: 'Create Post | Fresno Exchange',
+    },
+  ]),
   {
     path: 'posts/new',
     component: CreatePost,

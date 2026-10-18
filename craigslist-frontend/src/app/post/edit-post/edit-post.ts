@@ -1,3 +1,4 @@
+import { findPostDestination, PostDestination } from '../post-destinations';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -22,6 +23,7 @@ export class EditPost implements OnInit {
   protected readonly returnToMyPosts =
     this.route.snapshot.queryParamMap.get('returnTo') === 'my-posts';
   protected readonly postId = this.route.snapshot.paramMap.get('postId');
+  protected readonly destination = signal<PostDestination | null>(null);
   protected readonly publicationStatus = signal('PUBLISHED');
   protected readonly isLoading = signal(true);
   protected readonly isSubmitting = signal(false);
@@ -58,6 +60,7 @@ export class EditPost implements OnInit {
             return;
           }
 
+          this.destination.set(findPostDestination(post) ?? null);
           this.publicationStatus.set(post.status);
           this.postForm.setValue({
             title: post.title,
@@ -83,6 +86,8 @@ export class EditPost implements OnInit {
       return;
     }
 
+    const destination = this.destination();
+    if (!destination) return;
     const values = this.postForm.getRawValue();
     const location = values.location.trim();
 
@@ -93,8 +98,8 @@ export class EditPost implements OnInit {
       .updatePost(this.postId, {
         title: values.title.trim(),
         body: values.body.trim(),
-        category: 'COMMUNITY',
-        postType: 'GENERAL',
+        category: destination.category,
+        postType: destination.postType,
         location: location || null,
       })
       .pipe(

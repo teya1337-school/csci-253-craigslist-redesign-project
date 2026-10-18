@@ -59,8 +59,11 @@
               (click)="choose(post)"
             >
               <span class="suggestion-title">{{ post.title }}</span>
-              <span class="suggestion-meta"
-                >{{ post.username }} · {{ post.createdAt | date: 'mediumDate' }}
+              <span class="suggestion-meta">
+                @if (destinationFor(post); as destination) {
+                  {{ destination.categoryLabel }} / {{ destination.typeLabel }} ·
+                }
+                {{ post.username }} · {{ post.createdAt | date: 'mediumDate' }}
                 @if (post.location) {
                   · {{ post.location }}
                 }

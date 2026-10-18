@@ -2,10 +2,12 @@
   <div class="page-shell">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
       <a routerLink="/">Home</a>
-      <span aria-hidden="true">/</span>
-      <a routerLink="/community">Community</a>
-      <span aria-hidden="true">/</span>
-      <a routerLink="/community/general">General</a>
+      @if (destination(); as destination) {
+        <span aria-hidden="true">/</span>
+        <a [routerLink]="destination.categoryPath">{{ destination.categoryLabel }}</a>
+        <span aria-hidden="true">/</span>
+        <a [routerLink]="destination.path">{{ destination.typeLabel }}</a>
+      }
       @if (post()) {
         <span aria-hidden="true">/</span>
         <span aria-current="page">Post</span>
@@ -19,7 +21,7 @@
         <h1>Post unavailable</h1>
         <p>{{ errorMessage() }}</p>
         <div class="error-actions">
-          <a routerLink="/community/general">Back to General</a>
+          <a routerLink="/">Back to Home</a>
           <button type="button" (click)="loadPost()">Try again</button>
         </div>
       </section>
@@ -96,7 +98,7 @@
             </div>
           }
 
-          <p class="eyebrow">Community / General</p>
+          <p class="eyebrow">{{ destination()?.categoryLabel }} / {{ destination()?.typeLabel }}</p>
           <h1>{{ post.title }}</h1>
           <p class="post-meta">
             Posted by <app-user-link [userId]="post.userId" [username]="post.username" />
@@ -156,7 +158,9 @@
         </p>
       }
 
-      <a class="back-link" routerLink="/community/general">← Back to General discussions</a>
+      <a class="back-link" [routerLink]="destination()?.path"
+        >← Back to {{ destination()?.typeLabel }}</a
+      >
     }
   </div>
 </main>

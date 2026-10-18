@@ -81,6 +81,10 @@
                   ><h3>{{ post.title }}</h3></a
                 >
                 <p class="post-meta">
+                  @if (destinationFor(post); as destination) {
+                    <span>{{ destination.categoryLabel }} / {{ destination.typeLabel }}</span
+                    ><span aria-hidden="true">·</span>
+                  }
                   <app-user-link [userId]="post.userId" [username]="post.username" /><span
                     aria-hidden="true"
                     >·</span

@@ -1,3 +1,4 @@
+import { postCategories } from '../post/post-destinations';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
@@ -8,6 +9,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
   styleUrl: './home.scss',
 })
 export class Home {
+  protected readonly categories = postCategories;
   protected readonly accountDeleted =
     inject(ActivatedRoute).snapshot.queryParamMap.get('accountDeleted') === 'true';
 }

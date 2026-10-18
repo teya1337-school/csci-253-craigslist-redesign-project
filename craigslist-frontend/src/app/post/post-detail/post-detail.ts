@@ -1,3 +1,4 @@
+import { findPostDestination } from '../post-destinations';
 import { UserLink } from '../../shared/user-link/user-link';
 import { EditedIndicator } from '../../shared/edited-indicator/edited-indicator';
 import { DatePipe } from '@angular/common';
@@ -46,6 +47,9 @@ export class PostDetail implements OnInit {
   protected readonly isConfirmingDelete = signal(false);
   protected readonly isDeleting = signal(false);
   protected readonly deleteError = signal<string | null>(null);
+  protected readonly destination = computed(() =>
+    this.post() ? findPostDestination(this.post()!) : undefined,
+  );
   protected readonly isOwner = computed(() => {
     const post = this.post();
     const user = this.authService.currentUser();
@@ -174,7 +178,7 @@ export class PostDetail implements OnInit {
       .pipe(finalize(() => this.isDeleting.set(false)))
       .subscribe({
         next: () => {
-          void this.router.navigate(['/community/general'], {
+          void this.router.navigate([this.destination()?.path ?? '/'], {
             queryParams: { deleted: 'true' },
           });
         },

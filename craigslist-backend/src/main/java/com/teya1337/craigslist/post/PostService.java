@@ -49,6 +49,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<PostResponse> findPublishedPosts(PostCategory category, PostType postType) {
+        if (category != null && postType != null) validateDestination(category, postType);
         return postRepository.findAllByStatus(PostStatus.PUBLISHED)
                 .stream()
                 .filter(post -> category == null || post.getCategory() == category)
@@ -102,6 +103,7 @@ public class PostService {
 
     @Transactional
     public PostResponse createPost(UUID userId, PostRequest request) {
+        validateDestination(request.category(), request.postType());
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -120,6 +122,7 @@ public class PostService {
 
     @Transactional
     public PostResponse updatePost(UUID userId, UUID postId, PostRequest request) {
+        validateDestination(request.category(), request.postType());
         Post post = findOwnedActivePost(userId, postId);
         String location = normalizeLocation(request.location());
         if (java.util.Objects.equals(post.getTitle(), request.title())
@@ -175,6 +178,12 @@ public class PostService {
                 post.getEditedAt(),
                 post.getUpdatedAt()
         );
+    }
+
+    private void validateDestination(PostCategory category, PostType postType) {
+        if (category == null || postType == null || !category.supports(postType)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Choose a type that belongs to the selected category.");
+        }
     }
 
     private String normalizeLocation(String location) {

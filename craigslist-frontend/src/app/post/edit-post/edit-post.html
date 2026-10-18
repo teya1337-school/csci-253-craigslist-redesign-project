@@ -5,10 +5,10 @@
       <span aria-hidden="true">/</span>
       @if (returnToMyPosts) {
         <a routerLink="/my-posts" [queryParams]="{ status: publicationStatus() }">My Posts</a>
-      } @else {
-        <a routerLink="/community">Community</a>
+      } @else if (destination(); as destination) {
+        <a [routerLink]="destination.categoryPath">{{ destination.categoryLabel }}</a>
         <span aria-hidden="true">/</span>
-        <a routerLink="/community/general">General</a>
+        <a [routerLink]="destination.path">{{ destination.typeLabel }}</a>
       }
       @if (postId) {
         <span aria-hidden="true">/</span>
@@ -27,15 +27,15 @@
         <a
           class="cancel-button"
           [queryParams]="returnToMyPosts ? { status: publicationStatus() } : {}"
-          [routerLink]="returnToMyPosts ? ['/my-posts'] : ['/community/general']"
+          [routerLink]="returnToMyPosts ? ['/my-posts'] : ['/']"
         >
-          {{ returnToMyPosts ? 'Back to My Posts' : 'Back to General' }}
+          {{ returnToMyPosts ? 'Back to My Posts' : 'Back to Home' }}
         </a>
       </section>
     } @else {
       <section class="form-card" aria-labelledby="edit-post-heading">
         <header class="heading-group">
-          <p class="eyebrow">Community / General</p>
+          <p class="eyebrow">{{ destination()?.categoryLabel }} / {{ destination()?.typeLabel }}</p>
           <h1 id="edit-post-heading">Edit post</h1>
           <p>
             Editing as <strong>{{ authService.currentUser()?.username }}</strong>

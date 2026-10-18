@@ -234,6 +234,10 @@
                 <article>
                   <h3>{{ post.title }}</h3>
                   <p class="post-meta">
+                    @if (destinationFor(post); as destination) {
+                      <span>{{ destination.categoryLabel }} / {{ destination.typeLabel }}</span
+                      ><span aria-hidden="true">·</span>
+                    }
                     <time [attr.datetime]="post.createdAt">{{
                       post.createdAt | date: 'mediumDate'
                     }}</time>

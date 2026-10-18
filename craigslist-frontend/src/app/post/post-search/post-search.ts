@@ -1,3 +1,4 @@
+import { findPostDestination } from '../post-destinations';
 import { DatePipe } from '@angular/common';
 import {
   Component,
@@ -45,6 +46,7 @@ interface SearchState {
   styleUrl: './post-search.scss',
 })
 export class PostSearch implements OnInit {
+  protected readonly destinationFor = findPostDestination;
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly router = inject(Router);
   protected readonly isOpen = signal(false);

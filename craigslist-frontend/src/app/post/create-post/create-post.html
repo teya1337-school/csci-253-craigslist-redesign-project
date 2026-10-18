@@ -6,9 +6,9 @@
       @if (fromMyPosts) {
         <a routerLink="/my-posts">My Posts</a>
       } @else {
-        <a routerLink="/community">Community</a>
+        <a [routerLink]="destination()?.categoryPath">{{ destination()?.categoryLabel }}</a>
         <span aria-hidden="true">/</span>
-        <a routerLink="/community/general">General</a>
+        <a [routerLink]="destination()?.path">{{ destination()?.typeLabel }}</a>
       }
       <span aria-hidden="true">/</span>
       <span aria-current="page">Create post</span>
@@ -16,7 +16,13 @@
 
     <section class="form-card" aria-labelledby="create-post-heading">
       <header class="heading-group">
-        <p class="eyebrow">{{ fromMyPosts ? 'Your activity' : 'Community / General' }}</p>
+        <p class="eyebrow">
+          {{
+            fromMyPosts
+              ? 'Your activity'
+              : destination()?.categoryLabel + ' / ' + destination()?.typeLabel
+          }}
+        </p>
         <h1 id="create-post-heading">Create a post</h1>
         <p>
           Posting as <strong>{{ authService.currentUser()?.username }}</strong>
@@ -98,7 +104,7 @@
         </div>
 
         <div class="form-actions">
-          <a class="cancel-button" [routerLink]="fromMyPosts ? '/my-posts' : '/community/general'"
+          <a class="cancel-button" [routerLink]="fromMyPosts ? '/my-posts' : destination()?.path"
             >Cancel</a
           >
           <button class="submit-button" type="submit" [disabled]="isSubmitting()">

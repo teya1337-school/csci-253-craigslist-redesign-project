@@ -1,3 +1,4 @@
+import { findPostDestination } from '../../post/post-destinations';
 import { UserAvatar } from '../../shared/user-avatar';
 import { PictureDraft, ProfilePicture } from '../profile-picture/profile-picture';
 import { AuthService } from '../../auth/auth.service';
@@ -31,6 +32,7 @@ interface PublicProfile {
   styleUrls: ['../../community/general/general.scss', './user-profile.scss'],
 })
 export class UserProfile implements OnInit {
+  protected readonly destinationFor = findPostDestination;
   protected readonly authService = inject(AuthService);
   private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);

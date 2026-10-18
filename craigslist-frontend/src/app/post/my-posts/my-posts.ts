@@ -1,3 +1,4 @@
+import { findPostDestination } from '../post-destinations';
 import { UserLink } from '../../shared/user-link/user-link';
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -25,6 +26,7 @@ import { PostService } from '../post.service';
   styleUrl: './my-posts.scss',
 })
 export class MyPosts implements OnInit {
+  protected readonly destinationFor = findPostDestination;
   private readonly postService = inject(PostService);
   private readonly route = inject(ActivatedRoute);
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);

@@ -28,6 +28,7 @@ export class SiteHeader {
   private readonly elementRef = inject(ElementRef<HTMLElement>);
   private readonly router = inject(Router);
 
+  @ViewChildren('menuItem', { read: ElementRef })
   private menuItems?: QueryList<ElementRef<HTMLElement>>;
 
   protected readonly isAccountMenuOpen = signal(false);
@@ -35,7 +36,6 @@ export class SiteHeader {
   protected readonly signOutError = signal<string | null>(null);
 
   @ViewChild('accountTrigger') private accountTrigger?: ElementRef<HTMLButtonElement>;
-  @ViewChildren('menuItem', { read: ElementRef })
 
   // Compute the return URL for account-related actions based on the current route
   protected get accountReturnUrl(): string {

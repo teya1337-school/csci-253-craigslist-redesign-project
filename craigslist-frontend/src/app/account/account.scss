@@ -5,21 +5,21 @@
 .account-page {
   min-height: calc(100vh - 77px);
   padding: 56px 20px;
-  background: linear-gradient(180deg, #faf8fb 0%, #fff 55%);
+  background: #f6f7f9;
 }
 
 .account-card {
   width: min(100%, 680px);
   margin: 0 auto;
   padding: 34px;
-  border: 1px solid #ded8e2;
-  border-radius: 14px;
+  border: 1px solid #d9dfe6;
+  border-radius: 4px;
   background: #fff;
-  box-shadow: 0 16px 42px rgba(44, 30, 53, 0.08);
+  box-shadow: none;
 }
 
 .back-link {
-  color: #643083;
+  color: #2457a7;
   font-weight: 700;
   text-decoration: none;
 }
@@ -29,7 +29,7 @@
 }
 
 .back-link:focus-visible {
-  outline: 3px solid #8c5dad;
+  outline: 3px solid #a9c5ec;
   outline-offset: 3px;
 }
 
@@ -39,7 +39,7 @@
 
 .eyebrow {
   margin: 0 0 6px;
-  color: #6d378e;
+  color: #2457a7;
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -48,21 +48,21 @@
 
 h1 {
   margin: 0;
-  color: #302734;
-  font-family: Georgia, 'Times New Roman', serif;
+  color: #182433;
+  font-family: inherit;
   font-size: clamp(2rem, 5vw, 2.65rem);
 }
 
 .heading-group > p:last-child {
   margin: 10px 0 0;
-  color: #6d6672;
+  color: #65717e;
   line-height: 1.55;
 }
 
 h2 {
   margin: 0 0 22px;
   font-size: 1.2rem;
-  color: #302734;
+  color: #182433;
 }
 .field {
   display: grid;
@@ -71,7 +71,7 @@ h2 {
 }
 label {
   font-weight: 700;
-  color: #514b54;
+  color: #5d6875;
 }
 input {
   box-sizing: border-box;
@@ -79,20 +79,20 @@ input {
   min-height: 44px;
   padding: 10px 12px;
   border: 1px solid #aaa1b0;
-  border-radius: 7px;
+  border-radius: 4px;
   font: inherit;
-  color: #302734;
+  color: #182433;
 }
 input:focus-visible,
 button:focus-visible {
-  outline: 3px solid #8c5dad;
+  outline: 3px solid #a9c5ec;
   outline-offset: 3px;
 }
 .hint {
   margin: 0;
   font-size: 0.86rem;
   line-height: 1.5;
-  color: #756d79;
+  color: #687482;
 }
 .error {
   margin: 0;
@@ -102,7 +102,7 @@ button:focus-visible {
 .feedback {
   padding: 12px;
   margin-bottom: 18px;
-  border-radius: 7px;
+  border-radius: 4px;
   background: #fff1f2;
 }
 .success {
@@ -114,15 +114,15 @@ button {
   min-height: 44px;
   padding: 11px 20px;
   border: 0;
-  border-radius: 7px;
-  background: #643083;
+  border-radius: 4px;
+  background: #2457a7;
   color: white;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
 }
 button:hover {
-  background: #51246d;
+  background: #1c478a;
 }
 button:disabled {
   opacity: 0.55;
@@ -131,7 +131,7 @@ button:disabled {
 .password-section {
   margin-top: 36px;
   padding-top: 30px;
-  border-top: 1px solid #ded8e2;
+  border-top: 1px solid #d9dfe6;
 }
 
 @media (max-width: 600px) {
@@ -151,12 +151,12 @@ button:disabled {
 }
 .account-summary dt {
   font-weight: 700;
-  color: #514b54;
+  color: #5d6875;
   margin-bottom: 6px;
 }
 .account-summary dd {
   margin: 0;
-  color: #302734;
+  color: #182433;
   overflow-wrap: anywhere;
 }
 .actions {
@@ -166,12 +166,12 @@ button:disabled {
   flex-wrap: wrap;
 }
 .secondary {
-  color: #643083;
+  color: #2457a7;
   background: white;
   border: 1px solid #aaa1b0;
 }
 .secondary:hover {
-  background: #f5eff8;
+  background: #eef4fb;
 }
 .feedback {
   margin-top: 18px;
@@ -181,7 +181,7 @@ button:disabled {
   border-top: 1px solid #dec4c8;
   margin-top: 36px;
   padding-top: 30px;
-  color: #514b54;
+  color: #5d6875;
   line-height: 1.5;
 }
 .delete-section > .hint {

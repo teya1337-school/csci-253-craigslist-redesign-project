@@ -22,10 +22,10 @@
   min-height: 42px;
   padding: 8px 14px;
   box-sizing: border-box;
-  border: 1px solid #c9b6d5;
-  border-radius: 8px;
+  border: 1px solid #cfd6de;
+  border-radius: 4px;
   background: #fff;
-  color: #642f83;
+  color: #2457a7;
   font-size: 0.9rem;
   font-weight: 700;
   text-decoration: none;
@@ -42,29 +42,30 @@
   stroke-linejoin: round;
 }
 .message-user:hover {
-  background: #f5eff8;
-  border-color: #70418c;
+  background: #eef4fb;
+  border-color: #4f78b5;
 }
 .message-user:focus-visible {
-  outline: 3px solid #8c5dad;
+  outline: 3px solid #a9c5ec;
   outline-offset: 3px;
 }
 
 .profile-details {
-  padding: 24px;
+  padding: 24px 0;
   margin: 24px 0;
   background: white;
-  border: 1px solid #ded8e2;
-  border-radius: 12px;
-  color: #514b54;
+  border-top: 1px solid #d9dfe6;
+  border-bottom: 1px solid #d9dfe6;
+  border-radius: 0;
+  color: #5d6875;
   line-height: 1.5;
 }
 .profile-details h2 {
   margin-top: 0;
-  color: #302734;
+  color: #182433;
 }
 .profile-details a {
-  color: #643083;
+  color: #2457a7;
   overflow-wrap: anywhere;
 }
 .profile-bio {
@@ -85,16 +86,16 @@
   width: 100%;
   padding: 11px 12px;
   border: 1px solid #aaa1b0;
-  border-radius: 7px;
+  border-radius: 4px;
   font: inherit;
-  color: #302734;
+  color: #182433;
 }
 .profile-field textarea {
   resize: vertical;
 }
 .profile-hint {
   margin: 0;
-  color: #756d79;
+  color: #687482;
   font-size: 0.86rem;
 }
 .profile-error {
@@ -104,13 +105,13 @@
   padding: 16px;
   color: #255b35;
   background: #edf7ef;
-  border-radius: 8px;
+  border-radius: 4px;
 }
 .profile-button {
-  border: 1px solid #643083;
-  border-radius: 7px;
+  border: 1px solid #2457a7;
+  border-radius: 4px;
   padding: 11px 18px;
-  background: #643083;
+  background: #2457a7;
   color: white;
   font: inherit;
   font-weight: 700;
@@ -118,7 +119,7 @@
 }
 .profile-button.secondary {
   background: white;
-  color: #643083;
+  color: #2457a7;
 }
 .profile-button:disabled {
   opacity: 0.55;
@@ -133,13 +134,13 @@
 .profile-field input:focus-visible,
 .profile-field textarea:focus-visible,
 .profile-button:focus-visible {
-  outline: 3px solid #8c5dad;
+  outline: 3px solid #a9c5ec;
   outline-offset: 3px;
 }
 
 .profile-field input[readonly] {
-  background: #f5f2f7;
-  color: #756d79;
+  background: #f6f7f9;
+  color: #687482;
 }
 
 .page-heading.profile-heading {
@@ -200,11 +201,11 @@
 .profile-confirmation {
   margin-top: 28px;
   padding-top: 24px;
-  border-top: 1px solid #ded8e2;
+  border-top: 1px solid #d9dfe6;
 }
 .profile-confirmation h3 {
   margin: 0 0 8px;
-  color: #302734;
+  color: #182433;
 }
 .profile-confirmation > p {
   margin: 0;

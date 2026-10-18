@@ -14,8 +14,8 @@
 
 .comments-heading h2 {
   margin: 0;
-  color: #332b36;
-  font-family: Georgia, 'Times New Roman', serif;
+  color: #263443;
+  font-family: inherit;
   font-size: 1.55rem;
 }
 
@@ -26,9 +26,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
-  background: #eee5f2;
-  color: #5f2e7d;
+  border-radius: 4px;
+  background: #e8f0fa;
+  color: #2457a7;
   font-size: 0.82rem;
   font-weight: 800;
 }
@@ -46,9 +46,9 @@
   display: flex;
   align-items: center;
   border: 1px solid #a9a1ac;
-  border-radius: 26px;
+  border-radius: 4px;
   background: #fff;
-  color: #716a74;
+  color: #65717e;
   font: inherit;
   text-align: left;
   text-decoration: none;
@@ -57,9 +57,9 @@
 
 .open-composer:hover,
 .sign-in-prompt:hover {
-  border-color: #70418c;
-  background: #fcf9fd;
-  color: #5f2e7d;
+  border-color: #4f78b5;
+  background: #fafbfd;
+  color: #2457a7;
 }
 
 .sign-in-prompt {
@@ -71,12 +71,12 @@
   display: grid;
   gap: 10px;
   border: 1px solid #817789;
-  border-radius: 14px;
+  border-radius: 4px;
   background: #fff;
 }
 
 .comment-composer label {
-  color: #38313c;
+  color: #35414e;
   font-weight: 750;
 }
 
@@ -85,16 +85,16 @@
   min-height: 120px;
   padding: 11px 12px;
   border: 1px solid #aaa2ad;
-  border-radius: 8px;
-  color: #2d2830;
+  border-radius: 4px;
+  color: #263443;
   font: inherit;
   line-height: 1.55;
   resize: vertical;
 }
 
 .comment-composer textarea:focus {
-  border-color: #6d378e;
-  outline: 3px solid #e6d5ef;
+  border-color: #2457a7;
+  outline: 3px solid #dbe7f8;
 }
 
 .comment-composer textarea[aria-invalid='true'] {
@@ -111,7 +111,7 @@
 .error-message button {
   min-height: 40px;
   padding: 0 16px;
-  border-radius: 7px;
+  border-radius: 4px;
   font: inherit;
   font-weight: 750;
   cursor: pointer;
@@ -121,17 +121,17 @@
 .error-message button {
   border: 1px solid #a49da6;
   background: #fff;
-  color: #4e4751;
+  color: #4b5663;
 }
 
 .submit-button {
   border: 0;
-  background: #642f83;
+  background: #2457a7;
   color: #fff;
 }
 
 .submit-button:hover:not(:disabled) {
-  background: #4e2269;
+  background: #1c478a;
 }
 
 .composer-actions button:disabled {
@@ -153,8 +153,8 @@
   place-items: center;
   align-content: center;
   gap: 10px;
-  border-top: 1px solid #e4dfe6;
-  color: #6f6872;
+  border-top: 1px solid #e5e8ec;
+  color: #687482;
   text-align: center;
 }
 
@@ -164,8 +164,8 @@
 }
 
 .comments-message h3 {
-  color: #3e3741;
-  font-family: Georgia, 'Times New Roman', serif;
+  color: #35414e;
+  font-family: inherit;
 }
 
 .error-message p {
@@ -174,13 +174,13 @@
 
 .comment-list {
   margin-top: 24px;
-  border-top: 1px solid #ded8e2;
+  border-top: 1px solid #d9dfe6;
 }
 
 .comment-card {
   position: relative;
   padding: 22px 4px;
-  border-bottom: 1px solid #e7e2e9;
+  border-bottom: 1px solid #e5e8ec;
 }
 
 .comment-header {
@@ -194,17 +194,17 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  color: #777079;
+  color: #687482;
   font-size: 0.86rem;
 }
 
 .comment-meta strong {
-  color: #59316d;
+  color: #1d4c91;
 }
 
 .comment-content {
   margin: 10px 0 0;
-  color: #443e47;
+  color: #4b5663;
   line-height: 1.65;
   white-space: pre-wrap;
 }
@@ -222,15 +222,15 @@
   border: 1px solid transparent;
   border-radius: 50%;
   background: transparent;
-  color: #6c6570;
+  color: #687482;
   cursor: pointer;
 }
 
 .comment-menu-trigger:hover,
 .comment-menu-trigger[aria-expanded='true'] {
-  border-color: #d9d0df;
-  background: #f3edf6;
-  color: #5f2e7d;
+  border-color: #d9dfe6;
+  background: #edf3fa;
+  color: #2457a7;
 }
 
 .comment-menu-trigger svg {
@@ -246,10 +246,10 @@
   z-index: 2;
   width: 220px;
   padding: 7px;
-  border: 1px solid #d8d1dc;
-  border-radius: 9px;
+  border: 1px solid #d5dbe3;
+  border-radius: 4px;
   background: #fff;
-  box-shadow: 0 12px 30px rgba(31, 23, 39, 0.16);
+  box-shadow: 0 10px 24px rgba(25, 37, 51, 0.12);
 }
 
 .comment-menu button {
@@ -260,7 +260,7 @@
   align-items: center;
   gap: 10px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 4px;
   background: transparent;
   color: #37313b;
   font: inherit;
@@ -270,8 +270,8 @@
 }
 
 .comment-menu button:hover {
-  background: #f5eff8;
-  color: #542474;
+  background: #eef4fb;
+  color: #1d4c91;
 }
 
 .comment-menu button:last-child {
@@ -295,15 +295,15 @@
   padding: 14px;
   display: grid;
   gap: 10px;
-  border: 1px solid #cfc7d3;
-  border-radius: 9px;
+  border: 1px solid #cfd6de;
+  border-radius: 4px;
   background: #fff;
 }
 
 .edit-comment-form label,
 .delete-comment-confirmation h3 {
   margin: 0;
-  color: #38313c;
+  color: #35414e;
   font-weight: 750;
 }
 
@@ -312,16 +312,16 @@
   min-height: 100px;
   padding: 10px 11px;
   border: 1px solid #aaa2ad;
-  border-radius: 7px;
-  color: #2d2830;
+  border-radius: 4px;
+  color: #263443;
   font: inherit;
   line-height: 1.5;
   resize: vertical;
 }
 
 .edit-comment-form textarea:focus {
-  border-color: #6d378e;
-  outline: 3px solid #e6d5ef;
+  border-color: #2457a7;
+  outline: 3px solid #dbe7f8;
 }
 
 .delete-comment-confirmation {
@@ -348,17 +348,17 @@
   min-height: 38px;
   padding: 0 14px;
   border: 1px solid #a49da6;
-  border-radius: 7px;
+  border-radius: 4px;
   background: #fff;
-  color: #4e4751;
+  color: #4b5663;
   font: inherit;
   font-weight: 750;
   cursor: pointer;
 }
 
 .comment-action-buttons .save-comment-button {
-  border-color: #642f83;
-  background: #642f83;
+  border-color: #2457a7;
+  background: #2457a7;
   color: #fff;
 }
 
@@ -380,7 +380,7 @@
 .comment-menu-trigger:focus-visible,
 .comment-menu button:focus-visible,
 .comment-action-buttons button:focus-visible {
-  outline: 3px solid #8c5dad;
+  outline: 3px solid #a9c5ec;
   outline-offset: 3px;
 }
 
@@ -401,7 +401,7 @@
   padding-left: 14px;
 }
 .reply-context {
-  color: #69427f;
+  color: #1d4c91;
   font-size: 0.8rem;
   text-decoration: none;
 }
@@ -418,7 +418,7 @@
   border: 0;
   border-radius: 4px;
   background: transparent;
-  color: #5f2e7d;
+  color: #2457a7;
   font: inherit;
   font-size: 0.82rem;
   font-weight: 650;
@@ -441,15 +441,15 @@
   cursor: wait;
 }
 .reply-button:hover:not(:disabled) {
-  background: #f5eff8;
+  background: #eef4fb;
 }
 .reply-button:focus-visible,
 .reply-context:focus-visible {
-  outline: 3px solid #8c5dad;
+  outline: 3px solid #a9c5ec;
   outline-offset: 3px;
 }
 .reply-status {
-  color: #59316d;
+  color: #1d4c91;
 }
 .comment-content {
   overflow-wrap: anywhere;

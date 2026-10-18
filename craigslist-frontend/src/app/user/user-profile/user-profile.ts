@@ -62,8 +62,8 @@ export class UserProfile implements OnInit {
         this.isLoading.set(false);
         this.title.setTitle(
           profile
-            ? `${profile.username} | Fresno Exchange`
-            : 'Profile unavailable | Fresno Exchange',
+            ? `${profile.username} | ListNova`
+            : 'Profile unavailable | ListNova',
         );
       });
   }

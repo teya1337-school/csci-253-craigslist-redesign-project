@@ -5,7 +5,7 @@
 .post-page {
   min-height: calc(100dvh - 77px);
   padding: 42px 20px 72px;
-  background: linear-gradient(180deg, #faf8fb 0%, #fff 52%);
+  background: #f6f7f9;
 }
 
 .page-shell {
@@ -17,7 +17,7 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  color: #746d78;
+  color: #687482;
   font-size: 0.88rem;
   overflow-x: auto;
   white-space: nowrap;
@@ -25,7 +25,7 @@
 
 .breadcrumbs a,
 .back-link {
-  color: #643083;
+  color: #2457a7;
   font-weight: 700;
   text-decoration: none;
 }
@@ -38,17 +38,17 @@
 .post-card,
 .message-card {
   margin-top: 30px;
-  border: 1px solid #ded8e2;
-  border-radius: 14px;
+  border: 1px solid #d9dfe6;
+  border-radius: 4px;
   background: #fff;
-  box-shadow: 0 10px 30px rgba(45, 29, 55, 0.07);
+  box-shadow: none;
 }
 
 .success-alert {
   margin-top: 24px;
   padding: 13px 15px;
   border: 1px solid #acd2b5;
-  border-radius: 8px;
+  border-radius: 4px;
   background: #edf8ef;
   color: #255f32;
   font-weight: 700;
@@ -61,12 +61,12 @@
 .post-card header {
   position: relative;
   padding: 32px 76px 28px 34px;
-  border-bottom: 1px solid #e7e2e9;
+  border-bottom: 1px solid #e5e8ec;
 }
 
 .eyebrow {
   margin: 0 0 10px;
-  color: #6d378e;
+  color: #2457a7;
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -75,9 +75,9 @@
 
 h1 {
   margin: 0;
-  color: #302734;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(2rem, 5vw, 2.85rem);
+  color: #182433;
+  font-family: inherit;
+  font-size: clamp(1.65rem, 4vw, 2.35rem);
   line-height: 1.15;
 }
 
@@ -86,29 +86,29 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  color: #756e78;
+  color: #687482;
   font-size: 0.9rem;
 }
 
 .post-meta strong {
-  color: #59316d;
+  color: #1d4c91;
 }
 
 .post-location {
   margin: 14px 0 0;
-  color: #5c5560;
+  color: #65717e;
   font-size: 0.92rem;
   font-weight: 700;
 }
 
 .post-location span {
   margin-right: 4px;
-  color: #764292;
+  color: #2457a7;
 }
 
 .post-body {
   padding: 32px 34px 38px;
-  color: #403a43;
+  color: #4b5663;
   font-size: 1.02rem;
   line-height: 1.75;
   white-space: pre-wrap;
@@ -125,7 +125,7 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 7px;
+  border-radius: 4px;
   font: inherit;
   font-weight: 750;
   cursor: pointer;
@@ -149,15 +149,15 @@ h1 {
   border: 1px solid transparent;
   border-radius: 50%;
   background: transparent;
-  color: #655d69;
+  color: #687482;
   cursor: pointer;
 }
 
 .post-menu-trigger:hover,
 .post-menu-trigger[aria-expanded='true'] {
-  border-color: #d9d0df;
-  background: #f3edf6;
-  color: #5f2e7d;
+  border-color: #d9dfe6;
+  background: #edf3fa;
+  color: #2457a7;
 }
 
 .post-menu-trigger svg {
@@ -173,10 +173,10 @@ h1 {
   z-index: 2;
   width: 180px;
   padding: 7px;
-  border: 1px solid #d8d1dc;
-  border-radius: 9px;
+  border: 1px solid #d5dbe3;
+  border-radius: 4px;
   background: #fff;
-  box-shadow: 0 12px 30px rgba(31, 23, 39, 0.16);
+  box-shadow: 0 10px 24px rgba(25, 37, 51, 0.12);
 }
 
 .post-menu a,
@@ -188,7 +188,7 @@ h1 {
   align-items: center;
   gap: 10px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 4px;
   background: transparent;
   color: #37313b;
   font: inherit;
@@ -200,8 +200,8 @@ h1 {
 
 .post-menu a:hover,
 .post-menu button:hover {
-  background: #f5eff8;
-  color: #542474;
+  background: #eef4fb;
+  color: #1d4c91;
 }
 
 .post-menu button {
@@ -225,7 +225,7 @@ h1 {
   display: grid;
   gap: 16px;
   border: 1px solid #d9a6ab;
-  border-radius: 10px;
+  border-radius: 4px;
   background: #fff8f8;
 }
 
@@ -253,7 +253,7 @@ h1 {
 .delete-confirmation button {
   border: 1px solid #a49da6;
   background: #fff;
-  color: #4e4751;
+  color: #4b5663;
 }
 
 .delete-confirmation .confirm-delete-button {
@@ -279,7 +279,7 @@ h1 {
   place-items: center;
   align-content: center;
   gap: 12px;
-  color: #6b646f;
+  color: #65717e;
   text-align: center;
 }
 
@@ -306,10 +306,10 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #79508e;
-  border-radius: 7px;
+  border: 1px solid #4f78b5;
+  border-radius: 4px;
   background: #fff;
-  color: #5f2e7d;
+  color: #2457a7;
   font: inherit;
   font-weight: 750;
   text-decoration: none;
@@ -324,7 +324,7 @@ h1 {
 .delete-confirmation button:focus-visible,
 .error-actions a:focus-visible,
 .error-actions button:focus-visible {
-  outline: 3px solid #8c5dad;
+  outline: 3px solid #a9c5ec;
   outline-offset: 3px;
 }
 
@@ -356,4 +356,23 @@ h1 {
     align-items: stretch;
     flex-direction: column;
   }
+}
+
+.post-menu .publication-action {
+  color: #37313b;
+}
+.success-alert:empty {
+  display: none;
+}
+.unpublished-notice {
+  padding: 16px;
+  border: 1px solid #d9dfe6;
+  border-radius: 4px;
+  background: #f7f9fc;
+  color: #4b5663;
+  line-height: 1.5;
+}
+.unpublished-notice a {
+  color: #2457a7;
+  margin-left: 8px;
 }

@@ -11,73 +11,7 @@ interface PicturePreview {
 
 @Component({
   selector: 'app-post-pictures-editor',
-  template: `
-    <section class="pictures-editor" aria-labelledby="pictures-heading">
-      <h2 id="pictures-heading">Pictures <span>(optional)</span></h2>
-      <input
-        #fileInput
-        type="file"
-        accept="image/jpeg,image/png"
-        multiple
-        hidden
-        [disabled]="disabled()"
-        (change)="selectFiles($event)"
-      />
-      <button
-        type="button"
-        class="upload"
-        (click)="fileInput.click()"
-        [disabled]="disabled() || count() >= 5"
-      >
-        Upload pictures
-      </button>
-      <p class="hint">
-        Up to 5 JPEG or PNG pictures, 2 MB each, no larger than 4096 × 4096 pixels.
-      </p>
-      @if (error()) {
-        <p class="error" role="alert">{{ error() }}</p>
-      }
-      @if (count()) {
-        <p class="count" role="status">{{ count() }} of 5 pictures selected</p>
-        <div class="previews">
-          @for (id of existingPictures(); track id; let index = $index) {
-            <div class="preview">
-              <img
-                [src]="'/api/posts/' + postId() + '/pictures/' + id"
-                [alt]="'Post picture ' + (index + 1)"
-                draggable="false"
-              />
-              <button
-                type="button"
-                [disabled]="disabled()"
-                (click)="removeExisting(id)"
-                [attr.aria-label]="'Remove picture ' + (index + 1)"
-              >
-                Remove
-              </button>
-            </div>
-          }
-          @for (picture of additions(); track picture.url; let index = $index) {
-            <div class="preview">
-              <img
-                [src]="picture.url"
-                [alt]="'Selected picture ' + (index + 1)"
-                draggable="false"
-              />
-              <button
-                type="button"
-                [disabled]="disabled()"
-                (click)="removeNew(picture)"
-                [attr.aria-label]="'Remove selected picture ' + (index + 1)"
-              >
-                Remove
-              </button>
-            </div>
-          }
-        </div>
-      }
-    </section>
-  `,
+  templateUrl: './post-pictures-editor.html',
   styleUrl: './post-pictures-editor.scss',
 })
 export class PostPicturesEditor implements OnDestroy {
@@ -99,6 +33,7 @@ export class PostPicturesEditor implements OnDestroy {
     () => this.existingPictures().length + this.additions().length,
   );
 
+  // Read the selected files and clear the file input so it can be used again.
   protected selectFiles(event: Event): void {
     const input = event.target as HTMLInputElement;
     const files = Array.from(input.files ?? []);
@@ -106,6 +41,7 @@ export class PostPicturesEditor implements OnDestroy {
     this.addFiles(files);
   }
 
+  // Validate and add new picture files to the draft.
   protected addFiles(files: File[]): void {
     if (this.disabled() || files.length === 0) {
       return;
@@ -138,6 +74,7 @@ export class PostPicturesEditor implements OnDestroy {
     this.emitDraft();
   }
 
+  // Mark an existing picture for removal.
   protected removeExisting(id: string): void {
     if (this.disabled()) {
       return;
@@ -149,6 +86,7 @@ export class PostPicturesEditor implements OnDestroy {
     this.emitDraft();
   }
 
+  // Remove a newly selected picture and release its preview URL.
   protected removeNew(picture: PicturePreview): void {
     if (this.disabled()) {
       return;
@@ -162,6 +100,7 @@ export class PostPicturesEditor implements OnDestroy {
     this.emitDraft();
   }
 
+  // Send the current picture changes to the parent form.
   private emitDraft(): void {
     this.changed.emit({
       files: this.additions().map((picture) => picture.file),
@@ -169,6 +108,7 @@ export class PostPicturesEditor implements OnDestroy {
     });
   }
 
+  // Release any preview URLs when the component is destroyed.
   ngOnDestroy(): void {
     this.additions().forEach((picture) => URL.revokeObjectURL(picture.url));
   }

@@ -22,7 +22,7 @@ export class MessageDetail implements OnInit {
 
   private readonly reload = new Subject<void>();
 
-  // The mailbox is passed as route data from the parent route, so we can access it directly from the ActivatedRoute snapshot.
+  // The mailbox is passed as route data, so we can read it from the ActivatedRoute snapshot.
   protected readonly mailbox: Mailbox = this.route.snapshot.data['mailbox'];
 
   protected readonly message = signal<DirectMessage | null>(null);
@@ -67,10 +67,12 @@ export class MessageDetail implements OnInit {
       });
   }
 
+  // Retry loading the message.
   protected retry(): void {
     this.reload.next();
   }
 
+  // Show the delete confirmation and move focus to the cancel button.
   protected confirmDelete(): void {
     this.confirmingDelete.set(true);
     this.deleteError.set(null);
@@ -79,11 +81,13 @@ export class MessageDetail implements OnInit {
     );
   }
 
+  // Cancel the delete confirmation and return focus to the delete button.
   protected cancelDelete(): void {
     this.confirmingDelete.set(false);
     this.element.nativeElement.querySelector<HTMLButtonElement>('.delete-trigger')?.focus();
   }
 
+  // Delete the message and return to the current mailbox.
   protected deleteMessage(): void {
     const message = this.message();
 

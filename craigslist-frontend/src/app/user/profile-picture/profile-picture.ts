@@ -25,6 +25,7 @@ export class ProfilePicture {
   protected readonly removing = signal(false);
   protected readonly error = signal('');
 
+  // Release the preview URL when the component is destroyed.
   constructor() {
     this.destroyRef.onDestroy(() => this.releasePreview());
   }

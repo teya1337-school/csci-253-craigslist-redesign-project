@@ -108,6 +108,7 @@ export class PostComments implements OnInit {
     content: ['', [Validators.required, Validators.pattern(/\S/)]],
   });
 
+  // Load the comments when the component starts.
   ngOnInit(): void {
     this.loadComments();
   }

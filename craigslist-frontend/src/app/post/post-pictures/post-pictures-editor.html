@@ -1,0 +1,65 @@
+<section class="pictures-editor" aria-labelledby="pictures-heading">
+  <h2 id="pictures-heading">Pictures <span>(optional)</span></h2>
+  <input
+    #fileInput
+    type="file"
+    accept="image/jpeg,image/png"
+    multiple
+    hidden
+    [disabled]="disabled()"
+    (change)="selectFiles($event)"
+  />
+  <button
+    type="button"
+    class="upload"
+    (click)="fileInput.click()"
+    [disabled]="disabled() || count() >= 5"
+  >
+    Upload pictures
+  </button>
+  <p class="hint">
+    Up to 5 JPEG or PNG pictures, 2 MB each, no larger than 4096 × 4096 pixels.
+  </p>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (count()) {
+    <p class="count" role="status">{{ count() }} of 5 pictures selected</p>
+    <div class="previews">
+      @for (id of existingPictures(); track id; let index = $index) {
+        <div class="preview">
+          <img
+            [src]="'/api/posts/' + postId() + '/pictures/' + id"
+            [alt]="'Post picture ' + (index + 1)"
+            draggable="false"
+          />
+          <button
+            type="button"
+            [disabled]="disabled()"
+            (click)="removeExisting(id)"
+            [attr.aria-label]="'Remove picture ' + (index + 1)"
+          >
+            Remove
+          </button>
+        </div>
+      }
+      @for (picture of additions(); track picture.url; let index = $index) {
+        <div class="preview">
+          <img
+            [src]="picture.url"
+            [alt]="'Selected picture ' + (index + 1)"
+            draggable="false"
+          />
+          <button
+            type="button"
+            [disabled]="disabled()"
+            (click)="removeNew(picture)"
+            [attr.aria-label]="'Remove selected picture ' + (index + 1)"
+          >
+            Remove
+          </button>
+        </div>
+      }
+    </div>
+  }
+</section>

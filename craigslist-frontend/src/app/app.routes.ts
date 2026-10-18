@@ -9,8 +9,8 @@ import { Account } from './account/account';
 import { authGuard } from './auth/auth.guard';
 import { Signup } from './auth/signup/signup';
 import { Login } from './auth/login/login';
-import { Community } from './community/community';
-import { General } from './community/general/general';
+import { CategoryDirectory } from './browse/category-directory/category-directory';
+import { PostListing } from './browse/post-listing/post-listing';
 import { Home } from './home/home';
 import { CreatePost } from './post/create-post/create-post';
 import { EditPost } from './post/edit-post/edit-post';
@@ -20,14 +20,14 @@ export const routes: Routes = [
   { path: '', component: Home, title: 'Home | ListNova' },
   ...postCategories.map((category) => ({
     path: category.path.slice(1),
-    component: Community,
+    component: CategoryDirectory,
     data: { category },
     title: `${category.label} | ListNova`,
   })),
   ...postDestinations.flatMap((destination) => [
     {
       path: destination.path.slice(1),
-      component: General,
+      component: PostListing,
       data: { destination },
       title: `${destination.typeLabel} | ${destination.categoryLabel} | ListNova`,
     },

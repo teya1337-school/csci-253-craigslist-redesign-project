@@ -12,6 +12,7 @@ import { SiteHeader } from './shared/site-header/site-header';
 export class App implements OnInit {
   private readonly authService = inject(AuthService);
 
+  // Load the signed-in user when the application starts.
   ngOnInit(): void {
     this.authService.loadCurrentUser().subscribe();
   }

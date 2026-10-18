@@ -1,0 +1,7 @@
+@if (userId() && username() !== '[deleted]') {
+  <a [routerLink]="['/users', userId()]" [attr.aria-label]="'View profile of ' + username()">{{
+    username()
+  }}</a>
+} @else {
+  <span>{{ username() }}</span>
+}

@@ -189,6 +189,7 @@ export class MyPosts implements OnInit {
       });
   }
 
+  // Show the delete confirmation for the selected post.
   protected confirmDelete(post: PostResponse): void {
     this.closeMenu();
 
@@ -200,6 +201,7 @@ export class MyPosts implements OnInit {
     );
   }
 
+  // Cancel the delete confirmation and return focus to the menu button.
   protected cancelDelete(): void {
     this.pendingDelete.set(null);
     this.deleteError.set(null);

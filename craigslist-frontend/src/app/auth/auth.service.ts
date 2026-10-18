@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
 import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 import { AuthenticatedUser } from './models/authenticated-user';
 import { CsrfTokenResponse } from './models/csrf-token-response';
 import { LoginRequest } from './models/login-request';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class AuthService {
   private readonly http = inject(HttpClient);
 

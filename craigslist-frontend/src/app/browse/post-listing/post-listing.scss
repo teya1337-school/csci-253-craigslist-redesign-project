@@ -2,7 +2,7 @@
   display: block;
 }
 
-.general-page {
+.listing-page {
   min-height: calc(100dvh - 69px);
   padding: 42px 24px 72px;
   background: #fff;
@@ -250,7 +250,7 @@ h1 {
 }
 
 @media (max-width: 650px) {
-  .general-page {
+  .listing-page {
     padding: 30px 14px 54px;
   }
 

@@ -75,6 +75,7 @@ export class PostSearch implements OnInit {
 
   protected readonly search = new FormControl('', { nonNullable: true });
 
+  // Search after the user pauses typing and reset the search after navigation.
   ngOnInit(): void {
     const queries = merge(
       this.search.valueChanges.pipe(
@@ -120,6 +121,7 @@ export class PostSearch implements OnInit {
       ).subscribe(() => this.resetSearch());
   }
 
+  // Clear the search state and remove focus from this component after navigation.
   private resetSearch(): void {
     this.search.setValue('');
     this.close();
@@ -131,33 +133,40 @@ export class PostSearch implements OnInit {
     }
   }
 
+  // Clear the search text and return focus to the search box.
   protected clear(): void {
     this.search.setValue('');
     this.searchInput()?.nativeElement.focus();
   }
 
+  // Retry the current search.
   protected retrySearch(): void {
     this.retry.next();
   }
 
+  // Open the suggestions when the search has enough characters.
   protected open(): void {
     this.isOpen.set(this.search.value.trim().length >= 2);
   }
 
+  // Close the suggestions and clear the keyboard selection.
   protected close(): void {
     this.isOpen.set(false);
     this.activeIndex.set(-1);
   }
 
+  // Close the suggestions when the user clicks outside the search.
   @HostListener('document:pointerdown', ['$event'])
   protected closeOutside(event: PointerEvent): void {
     if (!this.element.nativeElement.contains(event.target as Node)) this.close();
   }
 
+  // Close the suggestions when focus leaves the search.
   protected handleFocusOut(event: FocusEvent): void {
     if (!this.element.nativeElement.contains(event.relatedTarget as Node | null)) this.close();
   }
 
+  // Let the user move through and select suggestions with the keyboard.
   protected handleKeydown(event: KeyboardEvent): void {
     if (event.isComposing) {
       return;
@@ -201,6 +210,7 @@ export class PostSearch implements OnInit {
     }
   }
 
+  // Open the selected post, or reset the search if that post is already open.
   protected choose(post: PostResponse): void {
     this.close();
 

@@ -71,6 +71,7 @@ export class PostDetail implements OnInit {
   @ViewChild('postMenu') private postMenu?: ElementRef<HTMLElement>;
   @ViewChild('postMenuTrigger') private postMenuTrigger?: ElementRef<HTMLButtonElement>;
 
+  // Close the post menu when the user clicks outside of it.
   @HostListener('document:click', ['$event'])
   protected closeMenuWhenClickingOutside(event: MouseEvent): void {
     if (this.isPostMenuOpen() && !this.postMenu?.nativeElement.contains(event.target as Node)) {
@@ -78,6 +79,7 @@ export class PostDetail implements OnInit {
     }
   }
 
+  // Close the post menu with the Escape key and return focus to its button.
   @HostListener('document:keydown.escape')
   protected closeMenuWithEscape(): void {
     if (this.isPostMenuOpen()) {
@@ -86,6 +88,7 @@ export class PostDetail implements OnInit {
     }
   }
 
+  // Reload the post whenever the post ID in the route changes.
   ngOnInit(): void {
     this.route.paramMap.pipe(
       takeUntilDestroyed(this.destroyRef)
@@ -100,6 +103,7 @@ export class PostDetail implements OnInit {
     });
   }
 
+  // Load the current post and show a useful error if it cannot be loaded.
   protected loadPost(): void {
     this.postRequest?.unsubscribe();
 
@@ -131,6 +135,7 @@ export class PostDetail implements OnInit {
       });
   }
 
+  // Publish or unpublish the post if the current user owns it.
   protected changePublication(): void {
     const post = this.post();
 
@@ -161,24 +166,29 @@ export class PostDetail implements OnInit {
       });
   }
 
+  // Show the confirmation before deleting the post.
   protected showDeleteConfirmation(): void {
     this.isPostMenuOpen.set(false);
     this.deleteError.set(null);
     this.isConfirmingDelete.set(true);
   }
 
+  // Toggle the post action menu.
   protected togglePostMenu(): void {
     this.isPostMenuOpen.update((isOpen) => !isOpen);
   }
 
+  // Close the post action menu.
   protected closePostMenu(): void {
     this.isPostMenuOpen.set(false);
   }
 
+  // Cancel the post deletion.
   protected cancelDelete(): void {
     this.isConfirmingDelete.set(false);
   }
 
+  // Delete the post and return to its category page.
   protected deletePost(): void {
     const post = this.post();
 

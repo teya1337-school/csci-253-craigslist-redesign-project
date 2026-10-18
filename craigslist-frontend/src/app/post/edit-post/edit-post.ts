@@ -43,6 +43,7 @@ export class EditPost implements OnInit {
     advertisement: [false],
   });
 
+  // Load the post when the edit page opens.
   ngOnInit(): void {
     this.loadPost();
   }
@@ -58,7 +59,6 @@ export class EditPost implements OnInit {
     this.isLoading.set(true);
     this.loadError.set(null);
 
-    // Load the post data from the server and populate the form.
     this.postService.getPost(this.postId).pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (post) => {

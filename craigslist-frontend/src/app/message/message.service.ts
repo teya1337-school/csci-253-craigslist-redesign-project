@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { effect, inject, Injectable, signal } from '@angular/core';
+import { effect, inject, Service, signal } from '@angular/core';
 import {
   catchError,
   EMPTY,
@@ -27,7 +27,7 @@ export interface DirectMessage {
   readAt: string | null;
 }
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class MessageService {
   private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);

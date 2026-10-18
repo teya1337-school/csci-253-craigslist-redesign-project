@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CommentRequest } from './models/comment-request';
 import { CommentResponse } from './models/comment-response';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class CommentService {
   private readonly http = inject(HttpClient);
 

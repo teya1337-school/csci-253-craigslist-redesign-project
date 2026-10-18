@@ -2,22 +2,10 @@ import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-edited-indicator',
-  template: `
-    @if (editedAt()) {
-      <span class="edited-label">Edited</span>
-    }
-  `,
-  styles: `
-    :host {
-      display: inline;
-    }
-    .edited-label {
-      color: #687482;
-      font-size: 0.82rem;
-      font-weight: 400;
-    }
-  `,
+  templateUrl: './edited-indicator.html',
+  styleUrl: './edited-indicator.scss',
 })
 export class EditedIndicator {
+  // Receive the edit time from the parent component.
   readonly editedAt = input.required<string | null>();
 }

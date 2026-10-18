@@ -38,7 +38,7 @@ interface PublicProfile {
     ProfilePicture,
   ],
   templateUrl: './user-profile.html',
-  styleUrls: ['../../community/general/general.scss', './user-profile.scss'],
+  styleUrls: ['../../browse/post-listing/post-listing.scss', './user-profile.scss'],
 })
 export class UserProfile implements OnInit {
   protected readonly authService = inject(AuthService);

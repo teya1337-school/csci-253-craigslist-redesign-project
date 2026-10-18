@@ -105,7 +105,7 @@ export class Account {
     this.editingPassword.set(true);
   }
 
-  // The user can cancel editing their password, which will reset the form and hide any errors or success messages.
+  // The user can cancel editing their password, which will reset the form and hide any errors.
   protected cancelPassword(): void {
     this.passwordForm.reset();
     this.passwordError.set('');

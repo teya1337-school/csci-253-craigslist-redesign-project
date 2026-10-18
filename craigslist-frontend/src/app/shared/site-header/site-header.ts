@@ -76,7 +76,7 @@ export class SiteHeader {
     }
   }
 
-  // Close the account menu and reset focus to the trigger button
+  // Close the account menu.
   protected closeAccountMenu(): void {
     this.isAccountMenuOpen.set(false);
   }

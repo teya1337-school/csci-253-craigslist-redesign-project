@@ -12,8 +12,8 @@
       <p>{{ category().description }}</p>
     </header>
 
-    <section aria-labelledby="discussion-types-heading">
-      <h2 id="discussion-types-heading">Types</h2>
+    <section aria-labelledby="post-types-heading">
+      <h2 id="post-types-heading">Types</h2>
 
       @for (destination of destinations(); track destination.path) {
         <a class="directory-card" [routerLink]="destination.path">

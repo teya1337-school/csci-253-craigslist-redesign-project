@@ -1,10 +1,10 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PostCategory, PostType, PostRequest } from './models/post-request';
 import { PostResponse } from './models/post-response';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class PostService {
   private readonly http = inject(HttpClient);
 

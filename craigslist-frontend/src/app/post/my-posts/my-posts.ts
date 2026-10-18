@@ -1,3 +1,4 @@
+import { AdBadge } from '../../shared/ad-badge';
 import { findPostDestination } from '../post-destinations';
 import { UserLink } from '../../shared/user-link/user-link';
 import { DatePipe } from '@angular/common';
@@ -21,7 +22,7 @@ import { PostService } from '../post.service';
 
 @Component({
   selector: 'app-my-posts',
-  imports: [UserLink, DatePipe, RouterLink, EditedIndicator],
+  imports: [AdBadge, UserLink, DatePipe, RouterLink, EditedIndicator],
   templateUrl: './my-posts.html',
   styleUrl: './my-posts.scss',
 })

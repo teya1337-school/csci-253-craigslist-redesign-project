@@ -1,3 +1,4 @@
+import { PostPicturesEditor, PostPictureDraft } from '../post-pictures/post-pictures-editor';
 import { DestinationPicker } from '../destination-picker/destination-picker';
 import { PostDestination } from '../post-destinations';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -10,7 +11,7 @@ import { PostService } from '../post.service';
 
 @Component({
   selector: 'app-create-post',
-  imports: [DestinationPicker, ReactiveFormsModule, RouterLink],
+  imports: [PostPicturesEditor, DestinationPicker, ReactiveFormsModule, RouterLink],
   templateUrl: './create-post.html',
   styleUrl: './create-post.scss',
 })
@@ -31,10 +32,12 @@ export class CreatePost {
   protected readonly isSubmitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
 
+  protected readonly pictureDraft = signal<PostPictureDraft>({ files: [], removedPictureIds: [] });
   protected readonly postForm = this.formBuilder.nonNullable.group({
     title: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(200)]],
     body: ['', [Validators.required, Validators.pattern(/\S/)]],
     location: ['', Validators.maxLength(255)],
+    advertisement: [false],
   });
 
   protected submit(): void {
@@ -60,13 +63,17 @@ export class CreatePost {
     this.postForm.disable();
 
     this.postService
-      .createPost({
-        title: values.title.trim(),
-        body: values.body.trim(),
-        category: destination.category,
-        postType: destination.postType,
-        location: location || null,
-      })
+      .createPost(
+        {
+          title: values.title.trim(),
+          body: values.body.trim(),
+          category: destination.category,
+          postType: destination.postType,
+          location: location || null,
+          advertisement: values.advertisement,
+        },
+        this.pictureDraft().files,
+      )
       .pipe(
         finalize(() => {
           this.isSubmitting.set(false);
@@ -86,6 +93,11 @@ export class CreatePost {
             this.errorMessage.set(
               'The service is unavailable right now. Please try again shortly.',
             );
+          } else if (
+            (error.status === 400 || error.status === 413) &&
+            typeof error.error?.detail === 'string'
+          ) {
+            this.errorMessage.set(error.error.detail);
           } else {
             this.errorMessage.set(
               'We could not publish your post. Please review it and try again.',

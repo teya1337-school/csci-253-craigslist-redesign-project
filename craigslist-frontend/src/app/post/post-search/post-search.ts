@@ -1,3 +1,4 @@
+import { AdBadge } from '../../shared/ad-badge';
 import { findPostDestination } from '../post-destinations';
 import { DatePipe } from '@angular/common';
 import {
@@ -41,7 +42,7 @@ interface SearchState {
 
 @Component({
   selector: 'app-post-search',
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [AdBadge, ReactiveFormsModule, DatePipe],
   templateUrl: './post-search.html',
   styleUrl: './post-search.scss',
 })

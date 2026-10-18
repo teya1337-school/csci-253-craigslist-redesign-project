@@ -11,10 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.imageio.ImageIO;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -34,48 +30,15 @@ public class ProfilePictureService {
     @Transactional
     public PictureResponse store(User user, MultipartFile file) {
         UUID userId = user.getId();
-        if (file.isEmpty() || file.getSize() > MAX_IMAGE_BYTES) {
-            throw badRequest("Choose a JPEG or PNG image up to 2 MB.");
-        }
-        byte[] imageData;
-        String contentType;
-        try {
-            imageData = file.getBytes();
-            if (imageData.length > MAX_IMAGE_BYTES) throw badRequest("Choose an image up to 2 MB.");
-            contentType = validateImage(imageData);
-        } catch (IOException exception) {
-            throw badRequest("We could not read that image. Choose a valid JPEG or PNG.");
-        }
+        var image = com.teya1337.craigslist.common.image.ImageUpload.read(file);
         ProfilePicture picture = pictures.findById(userId).orElseGet(ProfilePicture::new);
         picture.setUser(user);
-        picture.setContentType(contentType);
-        picture.setImageData(imageData);
+        picture.setContentType(image.contentType());
+        picture.setImageData(image.data());
         pictures.save(picture);
         user.setPictureVersion(UUID.randomUUID());
         users.saveAndFlush(user);
         return new PictureResponse(user.getPictureVersion());
-    }
-
-    private String validateImage(byte[] imageData) throws IOException {
-        try (var input = ImageIO.createImageInputStream(new ByteArrayInputStream(imageData))) {
-            var readers = ImageIO.getImageReaders(input);
-            if (!readers.hasNext()) throw badRequest("Choose a valid JPEG or PNG image.");
-            var reader = readers.next();
-            try {
-                String format = reader.getFormatName().toLowerCase(Locale.ROOT);
-                if (!format.equals("jpeg") && !format.equals("png")) throw badRequest("Choose a JPEG or PNG image.");
-                reader.setInput(input);
-                int width = reader.getWidth(0);
-                int height = reader.getHeight(0);
-                if (width < 1 || height < 1 || width > 4096 || height > 4096) {
-                    throw badRequest("Choose an image no larger than 4096 × 4096 pixels.");
-                }
-                if (reader.read(0) == null) throw badRequest("Choose a valid JPEG or PNG image.");
-                return format.equals("png") ? "image/png" : "image/jpeg";
-            } finally {
-                reader.dispose();
-            }
-        }
     }
 
     @Transactional

@@ -1,3 +1,4 @@
+import { PostPicturesEditor, PostPictureDraft } from '../post-pictures/post-pictures-editor';
 import { findPostDestination, PostDestination } from '../post-destinations';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
@@ -9,7 +10,7 @@ import { PostService } from '../post.service';
 
 @Component({
   selector: 'app-edit-post',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [PostPicturesEditor, ReactiveFormsModule, RouterLink],
   templateUrl: './edit-post.html',
   styleUrl: './edit-post.scss',
 })
@@ -30,10 +31,13 @@ export class EditPost implements OnInit {
   protected readonly loadError = signal<string | null>(null);
   protected readonly submitError = signal<string | null>(null);
 
+  protected readonly pictureDraft = signal<PostPictureDraft>({ files: [], removedPictureIds: [] });
+  protected readonly pictureIds = signal<string[]>([]);
   protected readonly postForm = this.formBuilder.nonNullable.group({
     title: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(200)]],
     body: ['', [Validators.required, Validators.pattern(/\S/)]],
     location: ['', Validators.maxLength(255)],
+    advertisement: [false],
   });
 
   ngOnInit(): void {
@@ -60,12 +64,15 @@ export class EditPost implements OnInit {
             return;
           }
 
+          this.pictureIds.set(post.pictureIds ?? []);
+          this.pictureDraft.set({ files: [], removedPictureIds: [] });
           this.destination.set(findPostDestination(post) ?? null);
           this.publicationStatus.set(post.status);
           this.postForm.setValue({
             title: post.title,
             body: post.body,
             location: post.location ?? '',
+            advertisement: post.advertisement ?? false,
           });
         },
         error: (error: HttpErrorResponse) => {
@@ -95,13 +102,19 @@ export class EditPost implements OnInit {
     this.postForm.disable();
 
     this.postService
-      .updatePost(this.postId, {
-        title: values.title.trim(),
-        body: values.body.trim(),
-        category: destination.category,
-        postType: destination.postType,
-        location: location || null,
-      })
+      .updatePost(
+        this.postId,
+        {
+          title: values.title.trim(),
+          body: values.body.trim(),
+          category: destination.category,
+          postType: destination.postType,
+          location: location || null,
+          advertisement: values.advertisement,
+        },
+        this.pictureDraft().files,
+        this.pictureDraft().removedPictureIds,
+      )
       .pipe(
         finalize(() => {
           this.isSubmitting.set(false);
@@ -122,6 +135,11 @@ export class EditPost implements OnInit {
             this.submitError.set('You must be signed in as the post owner to edit it.');
           } else if (error.status === 404) {
             this.submitError.set('This post could not be found.');
+          } else if (
+            (error.status === 400 || error.status === 413) &&
+            typeof error.error?.detail === 'string'
+          ) {
+            this.submitError.set(error.error.detail);
           } else {
             this.submitError.set('We could not save your changes. Please try again.');
           }

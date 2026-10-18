@@ -99,7 +99,12 @@
           }
 
           <p class="eyebrow">{{ destination()?.categoryLabel }} / {{ destination()?.typeLabel }}</p>
-          <h1>{{ post.title }}</h1>
+          <h1>
+            @if (post.advertisement) {
+              <app-ad-badge />
+            }
+            {{ post.title }}
+          </h1>
           <p class="post-meta">
             Posted by <app-user-link [userId]="post.userId" [username]="post.username" />
             <span aria-hidden="true">·</span>
@@ -117,6 +122,7 @@
           }
         </header>
 
+        <app-post-picture-gallery [postId]="post.id" [pictureIds]="post.pictureIds ?? []" />
         <div class="post-body">{{ post.body }}</div>
       </article>
 

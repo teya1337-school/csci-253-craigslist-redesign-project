@@ -67,6 +67,9 @@ public class Post {
     @Column(length = 255)
     private String location;
 
+    @Column(nullable = false)
+    private boolean advertisement;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default

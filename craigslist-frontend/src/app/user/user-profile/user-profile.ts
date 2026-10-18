@@ -1,3 +1,4 @@
+import { AdBadge } from '../../shared/ad-badge';
 import { findPostDestination } from '../../post/post-destinations';
 import { UserAvatar } from '../../shared/user-avatar';
 import { PictureDraft, ProfilePicture } from '../profile-picture/profile-picture';
@@ -27,7 +28,15 @@ interface PublicProfile {
 
 @Component({
   selector: 'app-user-profile',
-  imports: [DatePipe, RouterLink, EditedIndicator, ReactiveFormsModule, UserAvatar, ProfilePicture],
+  imports: [
+    AdBadge,
+    DatePipe,
+    RouterLink,
+    EditedIndicator,
+    ReactiveFormsModule,
+    UserAvatar,
+    ProfilePicture,
+  ],
   templateUrl: './user-profile.html',
   styleUrls: ['../../community/general/general.scss', './user-profile.scss'],
 })

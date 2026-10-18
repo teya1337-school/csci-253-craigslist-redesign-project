@@ -16,7 +16,7 @@ import static org.mockito.Mockito.*;
 
 class PostSearchTests {
     private final PostRepository posts = mock(PostRepository.class);
-    private final PostService service = new PostService(posts, mock(UserRepository.class));
+    private final PostService service = new PostService(posts, mock(UserRepository.class), mock(com.teya1337.craigslist.post.picture.PostPictureRepository.class));
 
     @Test void blankAndShortQueriesDoNotFetchPosts() {
         assertThat(service.searchPosts("   ").posts()).isEmpty();

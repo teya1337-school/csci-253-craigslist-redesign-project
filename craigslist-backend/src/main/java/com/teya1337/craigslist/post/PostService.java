@@ -30,6 +30,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final com.teya1337.craigslist.post.picture.PostPictureRepository pictures;
 
     @Transactional(readOnly = true)
     public PostSearchResponse searchPosts(String query) {
@@ -114,6 +115,7 @@ public class PostService {
                 .category(request.category())
                 .postType(request.postType())
                 .location(normalizeLocation(request.location()))
+                .advertisement(request.advertisement())
                 .status(PostStatus.PUBLISHED)
                 .build();
 
@@ -129,7 +131,8 @@ public class PostService {
                 && java.util.Objects.equals(post.getBody(), request.body())
                 && post.getCategory() == request.category()
                 && post.getPostType() == request.postType()
-                && java.util.Objects.equals(post.getLocation(), location)) {
+                && java.util.Objects.equals(post.getLocation(), location)
+                && post.isAdvertisement() == request.advertisement()) {
             return toResponse(post);
         }
         post.setEditedAt(Instant.now());
@@ -138,6 +141,7 @@ public class PostService {
         post.setCategory(request.category());
         post.setPostType(request.postType());
         post.setLocation(location);
+        post.setAdvertisement(request.advertisement());
         return toResponse(postRepository.saveAndFlush(post));
     }
 
@@ -148,7 +152,7 @@ public class PostService {
         post.setDeletedAt(Instant.now());
     }
 
-    private Post findOwnedActivePost(UUID userId, UUID postId) {
+    Post findOwnedActivePost(UUID userId, UUID postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
 
@@ -176,7 +180,9 @@ public class PostService {
                 post.getStatus(),
                 post.getCreatedAt(),
                 post.getEditedAt(),
-                post.getUpdatedAt()
+                post.getUpdatedAt(),
+                post.isAdvertisement(),
+                pictures.findPictureIds(post.getId())
         );
     }
 

@@ -27,12 +27,35 @@ export class PostService {
     return this.http.get<PostResponse>(`/api/posts/${postId}`);
   }
 
-  createPost(post: PostRequest): Observable<PostResponse> {
-    return this.http.post<PostResponse>('/api/posts', post);
+  createPost(post: PostRequest, files: readonly File[] = []): Observable<PostResponse> {
+    return this.http.post<PostResponse>('/api/posts', this.postData(post, files));
   }
 
-  updatePost(postId: string, post: PostRequest): Observable<PostResponse> {
-    return this.http.put<PostResponse>(`/api/posts/${postId}`, post);
+  updatePost(
+    postId: string,
+    post: PostRequest,
+    files: readonly File[] = [],
+    removedPictureIds: readonly string[] = [],
+  ): Observable<PostResponse> {
+    return this.http.put<PostResponse>(
+      `/api/posts/${postId}`,
+      this.postData(post, files, removedPictureIds),
+    );
+  }
+
+  private postData(
+    post: PostRequest,
+    files: readonly File[],
+    removedPictureIds: readonly string[] = [],
+  ): FormData {
+    const data = new FormData();
+    data.append('post', new Blob([JSON.stringify(post)], { type: 'application/json' }));
+    files.forEach((file) => data.append('files', file));
+    data.append(
+      'removedPictureIds',
+      new Blob([JSON.stringify(removedPictureIds)], { type: 'application/json' }),
+    );
+    return data;
   }
 
   changePublication(postId: string, published: boolean): Observable<PostResponse> {

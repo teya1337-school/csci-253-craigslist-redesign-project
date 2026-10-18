@@ -23,7 +23,7 @@ class PostServiceTests {
     void updatePostRejectsAUserWhoDoesNotOwnThePost() {
         PostRepository postRepository = mock(PostRepository.class);
         UserRepository userRepository = mock(UserRepository.class);
-        PostService postService = new PostService(postRepository, userRepository);
+        PostService postService = new PostService(postRepository, userRepository, mock(com.teya1337.craigslist.post.picture.PostPictureRepository.class));
 
         UUID ownerId = UUID.randomUUID();
         UUID otherUserId = UUID.randomUUID();
@@ -43,7 +43,8 @@ class PostServiceTests {
                 "Updated body",
                 PostCategory.COMMUNITY,
                 com.teya1337.craigslist.post.entity.PostType.GENERAL,
-                "Fresno, CA"
+                "Fresno, CA",
+                false
         );
 
         assertThatThrownBy(() -> postService.updatePost(otherUserId, postId, request))
@@ -55,7 +56,7 @@ class PostServiceTests {
     void editDateOnlyChangesWhenPostFieldsChange() {
         PostRepository posts = mock(PostRepository.class);
         UserRepository users = mock(UserRepository.class);
-        PostService service = new PostService(posts, users);
+        PostService service = new PostService(posts, users, mock(com.teya1337.craigslist.post.picture.PostPictureRepository.class));
         UUID ownerId = UUID.randomUUID();
         UUID postId = UUID.randomUUID();
         User owner = User.builder().id(ownerId).username("alice").build();
@@ -66,10 +67,10 @@ class PostServiceTests {
         when(posts.saveAndFlush(org.mockito.ArgumentMatchers.any(Post.class)))
                 .thenAnswer(call -> call.getArgument(0));
         PostRequest same = new PostRequest("Title", "Body", PostCategory.COMMUNITY,
-                com.teya1337.craigslist.post.entity.PostType.GENERAL, " ");
+                com.teya1337.craigslist.post.entity.PostType.GENERAL, " ", false);
         org.assertj.core.api.Assertions.assertThat(service.updatePost(ownerId, postId, same).editedAt()).isNull();
         PostRequest changed = new PostRequest("Title", "Changed body", PostCategory.COMMUNITY,
-                com.teya1337.craigslist.post.entity.PostType.GENERAL, null);
+                com.teya1337.craigslist.post.entity.PostType.GENERAL, null, false);
         var edited = service.updatePost(ownerId, postId, changed);
         org.assertj.core.api.Assertions.assertThat(edited.editedAt()).isNotNull();
         var unchanged = service.updatePost(ownerId, postId, changed);
@@ -79,7 +80,7 @@ class PostServiceTests {
     @Test void publicProfilePostsExcludeNonPublicContentAndSortNewestFirst() {
         PostRepository posts = mock(PostRepository.class);
         UserRepository users = mock(UserRepository.class);
-        PostService service = new PostService(posts, users);
+        PostService service = new PostService(posts, users, mock(com.teya1337.craigslist.post.picture.PostPictureRepository.class));
         UUID userId = UUID.randomUUID();
         User owner = User.builder().id(userId).username("bob").build();
         Post older = Post.builder().id(UUID.randomUUID()).user(owner).title("Older")

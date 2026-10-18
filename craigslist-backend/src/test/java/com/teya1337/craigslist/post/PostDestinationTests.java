@@ -20,7 +20,7 @@ class PostDestinationTests {
             for (PostCategory category : PostCategory.values()) {
                 assertThat(Arrays.stream(PostType.values()).filter(category::supports)).hasSize(2);
                 for (PostType type : PostType.values()) {
-                    var request = new PostRequest("Title", "Body", category, type, null);
+                    var request = new PostRequest("Title", "Body", category, type, null, false);
                     assertThat(validator.validate(request).isEmpty()).isEqualTo(category.supports(type));
                 }
             }
@@ -30,7 +30,7 @@ class PostDestinationTests {
     @Test void creatingAndEditingEveryDestinationPreservesItsCategoryAndType() {
         var posts = mock(PostRepository.class);
         var users = mock(UserRepository.class);
-        var service = new PostService(posts, users);
+        var service = new PostService(posts, users, mock(com.teya1337.craigslist.post.picture.PostPictureRepository.class));
         var user = User.builder().id(UUID.randomUUID()).username("alice").build();
         when(users.findById(user.getId())).thenReturn(Optional.of(user));
         when(posts.save(any(Post.class))).thenAnswer(call -> call.getArgument(0));
@@ -38,13 +38,13 @@ class PostDestinationTests {
         for (PostCategory category : PostCategory.values()) {
             for (PostType type : PostType.values()) {
                 if (!category.supports(type)) continue;
-                var response = service.createPost(user.getId(), new PostRequest("Title", "Body", category, type, null));
+                var response = service.createPost(user.getId(), new PostRequest("Title", "Body", category, type, null, false));
                 assertThat(response.category()).isEqualTo(category);
                 assertThat(response.postType()).isEqualTo(type);
                 var post = Post.builder().id(UUID.randomUUID()).user(user).category(category).postType(type)
                         .title("Title").body("Body").status(PostStatus.UNPUBLISHED).build();
                 when(posts.findById(post.getId())).thenReturn(Optional.of(post));
-                var updated = service.updatePost(user.getId(), post.getId(), new PostRequest("Changed", "Body", category, type, null));
+                var updated = service.updatePost(user.getId(), post.getId(), new PostRequest("Changed", "Body", category, type, null, false));
                 assertThat(updated.category()).isEqualTo(category);
                 assertThat(updated.postType()).isEqualTo(type);
                 assertThat(updated.status()).isEqualTo(PostStatus.UNPUBLISHED);
@@ -55,8 +55,8 @@ class PostDestinationTests {
     @Test void servicesRejectMismatchedCategoryAndTypeBeforeWriting() {
         var posts = mock(PostRepository.class);
         var users = mock(UserRepository.class);
-        var service = new PostService(posts, users);
-        var invalid = new PostRequest("Title", "Body", PostCategory.JOBS, PostType.FURNITURE, null);
+        var service = new PostService(posts, users, mock(com.teya1337.craigslist.post.picture.PostPictureRepository.class));
+        var invalid = new PostRequest("Title", "Body", PostCategory.JOBS, PostType.FURNITURE, null, false);
         assertThatThrownBy(() -> service.createPost(UUID.randomUUID(), invalid)).isInstanceOf(ResponseStatusException.class);
         assertThatThrownBy(() -> service.updatePost(UUID.randomUUID(), UUID.randomUUID(), invalid)).isInstanceOf(ResponseStatusException.class);
         assertThatThrownBy(() -> service.findPublishedPosts(PostCategory.JOBS, PostType.FURNITURE)).isInstanceOf(ResponseStatusException.class);

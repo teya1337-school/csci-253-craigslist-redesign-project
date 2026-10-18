@@ -1,3 +1,4 @@
+import { AdBadge } from '../../shared/ad-badge';
 import { UserLink } from '../../shared/user-link/user-link';
 import { EditedIndicator } from '../../shared/edited-indicator/edited-indicator';
 import { DatePipe } from '@angular/common';
@@ -12,7 +13,7 @@ import { PostService } from '../../post/post.service';
 
 @Component({
   selector: 'app-general',
-  imports: [UserLink, EditedIndicator, DatePipe, RouterLink],
+  imports: [AdBadge, UserLink, EditedIndicator, DatePipe, RouterLink],
   templateUrl: './general.html',
   styleUrl: './general.scss',
 })

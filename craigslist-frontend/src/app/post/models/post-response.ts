@@ -9,6 +9,8 @@ export interface PostResponse {
   category: PostCategory;
   postType: PostType;
   location: string | null;
+  advertisement: boolean;
+  pictureIds: string[];
   status: 'DRAFT' | 'PUBLISHED' | 'UNPUBLISHED' | 'DELETED';
   createdAt: string;
   editedAt: string | null;

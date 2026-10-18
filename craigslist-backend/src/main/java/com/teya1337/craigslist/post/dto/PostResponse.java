@@ -19,5 +19,7 @@ public record PostResponse(
         PostStatus status,
         Instant createdAt,
         Instant editedAt,
-        Instant updatedAt
+        Instant updatedAt,
+        boolean advertisement,
+        java.util.List<UUID> pictureIds
 ) {}

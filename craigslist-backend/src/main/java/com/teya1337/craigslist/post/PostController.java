@@ -56,7 +56,7 @@ public class PostController {
         return postService.findVisiblePost(postId, principal == null ? null : principal.getUserId());
     }
 
-    @PostMapping
+    @PostMapping(consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public PostResponse createPost(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -65,7 +65,7 @@ public class PostController {
         return postService.createPost(principal.getUserId(), request);
     }
 
-    @PutMapping("/{postId}")
+    @PutMapping(value = "/{postId}", consumes = "application/json")
     public PostResponse updatePost(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable UUID postId,

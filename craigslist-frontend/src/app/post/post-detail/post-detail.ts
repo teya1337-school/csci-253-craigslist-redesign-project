@@ -1,3 +1,5 @@
+import { PostPictureGallery } from '../post-pictures/post-picture-gallery';
+import { AdBadge } from '../../shared/ad-badge';
 import { findPostDestination } from '../post-destinations';
 import { UserLink } from '../../shared/user-link/user-link';
 import { EditedIndicator } from '../../shared/edited-indicator/edited-indicator';
@@ -24,7 +26,15 @@ import { PostService } from '../post.service';
 
 @Component({
   selector: 'app-post-detail',
-  imports: [UserLink, EditedIndicator, DatePipe, PostComments, RouterLink],
+  imports: [
+    PostPictureGallery,
+    AdBadge,
+    UserLink,
+    EditedIndicator,
+    DatePipe,
+    PostComments,
+    RouterLink,
+  ],
   templateUrl: './post-detail.html',
   styleUrl: './post-detail.scss',
 })

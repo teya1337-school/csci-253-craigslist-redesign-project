@@ -1,0 +1,65 @@
+.pictures-editor {
+  margin: 28px 0;
+}
+h2 {
+  margin: 0 0 12px;
+  color: #332e36;
+  font:
+    750 1rem system-ui,
+    sans-serif;
+}
+h2 span,
+.hint,
+.count {
+  color: #746d77;
+  font-size: 0.87rem;
+  font-weight: 400;
+}
+.hint {
+  line-height: 1.5;
+}
+button {
+  padding: 10px 14px;
+  border: 1px solid #a7a0aa;
+  border-radius: 7px;
+  background: #fff;
+  color: #5f2e7d;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+button:hover {
+  background: #f5eff8;
+}
+button:focus-visible {
+  outline: 3px solid #8c5dad;
+  outline-offset: 3px;
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.previews {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.preview {
+  width: 120px;
+  display: grid;
+  gap: 8px;
+}
+.preview img {
+  width: 120px;
+  height: 100px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 7px;
+}
+.preview button {
+  padding: 7px 10px;
+  font-size: 0.85rem;
+}
+.error {
+  color: #982626;
+}

@@ -12,7 +12,8 @@ public record PostRequest(
         @NotBlank String body,
         @NotNull PostCategory category,
         @NotNull PostType postType,
-        @Size(max = 255) String location
+        @Size(max = 255) String location,
+        boolean advertisement
 ) {
     @AssertTrue(message = "Choose a type that belongs to the selected category.")
     public boolean isDestinationValid() {

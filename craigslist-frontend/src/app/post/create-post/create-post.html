@@ -81,6 +81,16 @@
           }
         </div>
 
+        <app-post-pictures-editor
+          [disabled]="isSubmitting()"
+          (changed)="pictureDraft.set($event)"
+        />
+
+        <label class="advertisement-option">
+          <input type="checkbox" formControlName="advertisement" />
+          <span>This post is an advertisement.</span>
+        </label>
+
         <div class="field">
           <label for="location">Location or venue <span class="optional">(optional)</span></label>
           <input

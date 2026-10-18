@@ -77,10 +77,23 @@
                 <a
                   class="post-title-link"
                   [routerLink]="['/posts', post.id]"
-                  [attr.aria-label]="'Open post: ' + post.title"
-                  ><h3>{{ post.title }}</h3></a
+                  [attr.aria-label]="
+                    (post.advertisement ? 'Advertisement. ' : '') + 'Open post: ' + post.title
+                  "
+                  ><h3>
+                    @if (post.advertisement) {
+                      <app-ad-badge />
+                    }
+                    {{ post.title }}
+                  </h3></a
                 >
                 <p class="post-meta">
+                  @if (post.pictureIds?.length) {
+                    <span
+                      >{{ post.pictureIds.length }}
+                      {{ post.pictureIds.length === 1 ? 'photo' : 'photos' }}</span
+                    ><span aria-hidden="true">·</span>
+                  }
                   @if (destinationFor(post); as destination) {
                     <span>{{ destination.categoryLabel }} / {{ destination.typeLabel }}</span
                     ><span aria-hidden="true">·</span>

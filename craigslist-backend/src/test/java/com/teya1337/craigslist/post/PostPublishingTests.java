@@ -14,7 +14,7 @@ import static org.mockito.Mockito.*;
 
 class PostPublishingTests {
     private final PostRepository posts = mock(PostRepository.class);
-    private final PostService service = new PostService(posts, mock(UserRepository.class));
+    private final PostService service = new PostService(posts, mock(UserRepository.class), mock(com.teya1337.craigslist.post.picture.PostPictureRepository.class));
     private final UUID ownerId = UUID.randomUUID();
     private final User owner = User.builder().id(ownerId).username("alice").build();
     private final Post post = Post.builder().id(UUID.randomUUID()).user(owner)

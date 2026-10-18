@@ -35,16 +35,25 @@ it.each(postDestinations)(
     });
     const component = TestBed.createComponent(CreatePost).componentInstance;
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
-    component['postForm'].setValue({ title: 'Title', body: 'Body', location: '' });
-    component['submit']();
-    expect(component['fromMyPosts']).toBe(false);
-    expect(service.createPost).toHaveBeenCalledWith({
+    component['postForm'].setValue({
       title: 'Title',
       body: 'Body',
-      location: null,
-      category: destination.category,
-      postType: destination.postType,
+      location: '',
+      advertisement: destination.category === 'SERVICES',
     });
+    component['submit']();
+    expect(component['fromMyPosts']).toBe(false);
+    expect(service.createPost).toHaveBeenCalledWith(
+      {
+        title: 'Title',
+        body: 'Body',
+        location: null,
+        advertisement: destination.category === 'SERVICES',
+        category: destination.category,
+        postType: destination.postType,
+      },
+      [],
+    );
     expect(navigate).toHaveBeenCalledWith([destination.path], { queryParams: { created: 'true' } });
   },
 );
@@ -52,18 +61,17 @@ it.each(postDestinations)(
   'editing retains $categoryLabel / $typeLabel and publication status',
   (destination) => {
     const service = {
-      getPost: vi
-        .fn()
-        .mockReturnValue(
-          of({
-            ...destination,
-            userId: 'owner',
-            title: 'Title',
-            body: 'Body',
-            status: 'UNPUBLISHED',
-            location: null,
-          }),
-        ),
+      getPost: vi.fn().mockReturnValue(
+        of({
+          ...destination,
+          userId: 'owner',
+          title: 'Title',
+          body: 'Body',
+          status: 'UNPUBLISHED',
+          location: null,
+          advertisement: destination.category === 'SERVICES',
+        }),
+      ),
       updatePost: vi.fn().mockReturnValue(of({})),
     };
     TestBed.configureTestingModule({
@@ -88,13 +96,19 @@ it.each(postDestinations)(
     component.ngOnInit();
     component['postForm'].controls.title.setValue('Changed');
     component['submit']();
-    expect(service.updatePost).toHaveBeenCalledWith('post', {
-      title: 'Changed',
-      body: 'Body',
-      location: null,
-      category: destination.category,
-      postType: destination.postType,
-    });
+    expect(service.updatePost).toHaveBeenCalledWith(
+      'post',
+      {
+        title: 'Changed',
+        body: 'Body',
+        location: null,
+        advertisement: destination.category === 'SERVICES',
+        category: destination.category,
+        postType: destination.postType,
+      },
+      [],
+      [],
+    );
     expect(component['publicationStatus']()).toBe('UNPUBLISHED');
   },
 );

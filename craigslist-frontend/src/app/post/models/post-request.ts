@@ -18,4 +18,5 @@ export interface PostRequest {
   category: PostCategory;
   postType: PostType;
   location: string | null;
+  advertisement: boolean;
 }

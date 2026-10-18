@@ -2,7 +2,7 @@
   display: block;
   margin-bottom: 28px;
   padding-bottom: 24px;
-  border-bottom: 1px solid #ded8e2;
+  border-bottom: 1px solid #d9dfe6;
 }
 .picture-preview {
   --avatar-size: 96px;
@@ -17,14 +17,14 @@
 p {
   font-size: 0.9rem;
   line-height: 1.5;
-  color: #756d79;
+  color: #687482;
 }
 button {
   border: 1px solid #aaa1b0;
   background: white;
-  color: #643083;
+  color: #2457a7;
   padding: 10px 16px;
-  border-radius: 7px;
+  border-radius: 4px;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -44,6 +44,6 @@ button:disabled {
 }
 input:focus-visible,
 button:focus-visible {
-  outline: 3px solid #8c5dad;
+  outline: 3px solid #a9c5ec;
   outline-offset: 3px;
 }

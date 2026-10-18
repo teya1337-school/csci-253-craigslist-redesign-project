@@ -23,8 +23,8 @@ import { Component, input, signal } from '@angular/core';
       height: var(--avatar-size, 40px);
       flex-shrink: 0;
       border-radius: 50%;
-      background: #f2e9f7;
-      color: #643083;
+      background: #e8f0fa;
+      color: #2457a7;
       overflow: hidden;
     }
     img {

@@ -357,3 +357,22 @@ h1 {
     flex-direction: column;
   }
 }
+
+.post-menu .publication-action {
+  color: #37313b;
+}
+.success-alert:empty {
+  display: none;
+}
+.unpublished-notice {
+  padding: 16px;
+  border: 1px solid #ded8e2;
+  border-radius: 8px;
+  background: #f7f3f9;
+  color: #4f4059;
+  line-height: 1.5;
+}
+.unpublished-notice a {
+  color: #642f83;
+  margin-left: 8px;
+}

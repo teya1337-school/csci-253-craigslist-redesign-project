@@ -7,7 +7,7 @@ export interface PostResponse {
   category: 'COMMUNITY';
   postType: 'GENERAL';
   location: string | null;
-  status: 'DRAFT' | 'PUBLISHED' | 'HIDE' | 'DELETED';
+  status: 'DRAFT' | 'PUBLISHED' | 'UNPUBLISHED' | 'DELETED';
   createdAt: string;
   editedAt: string | null;
   updatedAt: string;

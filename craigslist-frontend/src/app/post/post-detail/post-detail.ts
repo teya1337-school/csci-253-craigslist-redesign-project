@@ -38,6 +38,9 @@ export class PostDetail implements OnInit {
   protected readonly post = signal<PostResponse | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly publicationMessage = signal('');
+  protected readonly publicationError = signal('');
+  protected readonly changingPublication = signal(false);
   protected readonly wasUpdated = signal(false);
   protected readonly isPostMenuOpen = signal(false);
   protected readonly isConfirmingDelete = signal(false);
@@ -69,6 +72,8 @@ export class PostDetail implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.publicationMessage.set('');
+      this.publicationError.set('');
       this.wasUpdated.set(this.route.snapshot.queryParamMap.get('updated') === 'true');
       this.isPostMenuOpen.set(false);
       this.isConfirmingDelete.set(false);
@@ -106,6 +111,33 @@ export class PostDetail implements OnInit {
               : 'We could not load this post. Please try again.',
           );
         },
+      });
+  }
+
+  protected changePublication(): void {
+    const post = this.post();
+    if (!post || !this.isOwner() || this.changingPublication()) return;
+    this.closePostMenu();
+    this.publicationError.set('');
+    this.changingPublication.set(true);
+    this.postService
+      .changePublication(post.id, post.status !== 'PUBLISHED')
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.changingPublication.set(false)),
+      )
+      .subscribe({
+        next: (updated) => {
+          if (this.post()?.id !== updated.id) return;
+          this.post.set(updated);
+          this.publicationMessage.set(
+            updated.status === 'PUBLISHED'
+              ? 'Post published.'
+              : 'Post unpublished. Only you can view it.',
+          );
+        },
+        error: () =>
+          this.publicationError.set('We could not change publication. Please try again.'),
       });
   }
 

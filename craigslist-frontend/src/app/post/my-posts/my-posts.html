@@ -13,9 +13,38 @@
       <a class="create-button" routerLink="/posts/new">Create post</a>
     </header>
     <p class="success-message" role="status">{{ statusMessage() }}</p>
+    @if (publicationError()) {
+      <p class="delete-error" role="alert">{{ publicationError() }}</p>
+    }
+    <nav class="publication-tabs" aria-label="Post publication status">
+      <a
+        routerLink="/my-posts"
+        [queryParams]="{ status: 'PUBLISHED' }"
+        [class.active]="selectedStatus() === 'PUBLISHED'"
+        [attr.aria-current]="selectedStatus() === 'PUBLISHED' ? 'page' : null"
+      >
+        Published
+        @if (!isLoading() && !errorMessage()) {
+          ({{ publishedPosts().length }})
+        }
+      </a>
+      <a
+        routerLink="/my-posts"
+        [queryParams]="{ status: 'UNPUBLISHED' }"
+        [class.active]="selectedStatus() === 'UNPUBLISHED'"
+        [attr.aria-current]="selectedStatus() === 'UNPUBLISHED' ? 'page' : null"
+      >
+        Unpublished
+        @if (!isLoading() && !errorMessage()) {
+          ({{ unpublishedPosts().length }})
+        }
+      </a>
+    </nav>
     <section class="posts-section" aria-labelledby="your-posts-heading">
       <div class="section-heading">
-        <h2 id="your-posts-heading">Your posts</h2>
+        <h2 id="your-posts-heading">
+          {{ selectedStatus() === 'PUBLISHED' ? 'Published posts' : 'Unpublished posts' }}
+        </h2>
         <span>Newest first</span>
       </div>
       @if (isLoading()) {
@@ -26,14 +55,22 @@
           <button type="button" (click)="loadPosts()">Try again</button>
           <a routerLink="/login" [queryParams]="{ returnUrl: '/my-posts' }">Sign in</a>
         </div>
-      } @else if (posts().length === 0) {
+      } @else if (visiblePosts().length === 0) {
         <div class="message-state">
-          <h3>No posts yet</h3>
-          <p>Your posts will appear here once you publish them.</p>
-          <a routerLink="/posts/new">Create your first post</a>
+          <h3>
+            {{ selectedStatus() === 'PUBLISHED' ? 'No published posts' : 'No unpublished posts' }}
+          </h3>
+          <p>
+            {{
+              selectedStatus() === 'PUBLISHED'
+                ? 'Your publicly visible posts appear here.'
+                : 'Posts you unpublish appear here. Only you can view them.'
+            }}
+          </p>
+          <a routerLink="/posts/new">Create post</a>
         </div>
       } @else {
-        @for (post of posts(); track post.id) {
+        @for (post of visiblePosts(); track post.id) {
           <article class="post-row">
             <div class="row-heading">
               <div class="post-link">
@@ -88,7 +125,7 @@
                     <a
                       role="menuitem"
                       [routerLink]="['/posts', post.id, 'edit']"
-                      [queryParams]="{ returnTo: 'my-posts' }"
+                      [queryParams]="{ returnTo: 'my-posts', status: selectedStatus() }"
                     >
                       <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path
@@ -96,6 +133,19 @@
                         /></svg
                       >Edit post</a
                     >
+                    <button
+                      type="button"
+                      role="menuitem"
+                      class="publication-action"
+                      (click)="changePublication(post)"
+                      [disabled]="changingPublication() !== null || isDeleting()"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 12s3-6 9-6 9 6 9 6-3 6-9 6-9-6-9-6Z" />
+                        <circle cx="12" cy="12" r="2.5" />
+                      </svg>
+                      {{ post.status === 'PUBLISHED' ? 'Unpublish' : 'Publish' }}
+                    </button>
                     <button
                       type="button"
                       role="menuitem"
@@ -116,7 +166,10 @@
                 [attr.aria-labelledby]="'delete-heading-' + post.id"
               >
                 <h3 [id]="'delete-heading-' + post.id">Delete this post?</h3>
-                <p>This will remove “{{ post.title }}” from public view.</p>
+                <p>
+                  “{{ post.title }}” will be removed from My Posts and public view. You cannot
+                  restore it from the website. To keep it for later, use Unpublish instead.
+                </p>
                 @if (deleteError()) {
                   <p class="delete-error" role="alert">{{ deleteError() }}</p>
                 }

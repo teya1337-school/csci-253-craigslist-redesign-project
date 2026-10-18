@@ -62,7 +62,7 @@ public class PostService {
     public List<PostResponse> findPostsByUserId(UUID userId) {
         return postRepository.findAllByUserId(userId)
                 .stream()
-                .filter(post -> post.getStatus() != PostStatus.DELETED)
+                .filter(post -> post.getStatus() == PostStatus.PUBLISHED || post.getStatus() == PostStatus.UNPUBLISHED)
                 .map(this::toResponse)
                 .toList();
     }
@@ -80,6 +80,24 @@ public class PostService {
     public PostResponse findPublishedPost(UUID postId) {
         return toResponse(postRepository.findByIdAndStatus(postId, PostStatus.PUBLISHED)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found")));
+    }
+
+    @Transactional(readOnly = true)
+    public PostResponse findVisiblePost(UUID postId, UUID viewerId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        if (post.getStatus() != PostStatus.PUBLISHED
+                && !(post.getStatus() == PostStatus.UNPUBLISHED && post.getUser().getId().equals(viewerId))) {
+            throw new ResourceNotFoundException("Post not found");
+        }
+        return toResponse(post);
+    }
+
+    @Transactional
+    public PostResponse changePublication(UUID userId, UUID postId, boolean published) {
+        Post post = findOwnedActivePost(userId, postId);
+        post.setStatus(published ? PostStatus.PUBLISHED : PostStatus.UNPUBLISHED);
+        return toResponse(postRepository.saveAndFlush(post));
     }
 
     @Transactional

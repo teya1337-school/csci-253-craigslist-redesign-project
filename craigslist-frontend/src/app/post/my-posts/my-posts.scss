@@ -282,3 +282,24 @@ button:focus-visible {
   display: block;
   text-decoration: none;
 }
+
+.publication-tabs {
+  display: flex;
+  gap: 12px;
+  margin: 24px 0 20px;
+  border-bottom: 1px solid #ded8e2;
+}
+.publication-tabs a {
+  padding: 12px 16px;
+  border-bottom: 3px solid transparent;
+  color: #655d69;
+  font-weight: 750;
+  text-decoration: none;
+}
+.publication-tabs a.active {
+  color: #642f83;
+  border-bottom-color: #642f83;
+}
+.post-menu .publication-action {
+  color: #37313b;
+}

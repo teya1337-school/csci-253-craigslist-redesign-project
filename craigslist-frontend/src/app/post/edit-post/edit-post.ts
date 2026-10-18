@@ -22,6 +22,7 @@ export class EditPost implements OnInit {
   protected readonly returnToMyPosts =
     this.route.snapshot.queryParamMap.get('returnTo') === 'my-posts';
   protected readonly postId = this.route.snapshot.paramMap.get('postId');
+  protected readonly publicationStatus = signal('PUBLISHED');
   protected readonly isLoading = signal(true);
   protected readonly isSubmitting = signal(false);
   protected readonly loadError = signal<string | null>(null);
@@ -57,6 +58,7 @@ export class EditPost implements OnInit {
             return;
           }
 
+          this.publicationStatus.set(post.status);
           this.postForm.setValue({
             title: post.title,
             body: post.body,
@@ -106,7 +108,7 @@ export class EditPost implements OnInit {
           void this.router.navigate(
             this.returnToMyPosts ? ['/my-posts'] : ['/posts', this.postId],
             {
-              queryParams: { updated: 'true' },
+              queryParams: { updated: 'true', status: this.publicationStatus() },
             },
           );
         },

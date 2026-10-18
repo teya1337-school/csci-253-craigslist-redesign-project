@@ -28,6 +28,16 @@
         <div class="success-alert" role="status">Your changes were saved.</div>
       }
 
+      <p class="success-alert" role="status">{{ publicationMessage() }}</p>
+      @if (publicationError()) {
+        <p class="delete-error" role="alert">{{ publicationError() }}</p>
+      }
+      @if (post.status === 'UNPUBLISHED') {
+        <p class="unpublished-notice">
+          Unpublished — only you can view this post.
+          <a routerLink="/my-posts" [queryParams]="{ status: 'UNPUBLISHED' }">My Posts</a>
+        </p>
+      }
       <article class="post-card">
         <header>
           @if (isOwner()) {
@@ -62,6 +72,19 @@
                     </svg>
                     Edit post
                   </a>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    class="publication-action"
+                    (click)="changePublication()"
+                    [disabled]="changingPublication() || isDeleting()"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M3 12s3-6 9-6 9 6 9 6-3 6-9 6-9-6-9-6Z" />
+                      <circle cx="12" cy="12" r="2.5" />
+                    </svg>
+                    {{ post.status === 'PUBLISHED' ? 'Unpublish' : 'Publish' }}
+                  </button>
                   <button type="button" role="menuitem" (click)="showDeleteConfirmation()">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"></path>
@@ -100,7 +123,10 @@
           <section class="delete-confirmation" aria-labelledby="delete-heading">
             <div>
               <h2 id="delete-heading">Delete this post?</h2>
-              <p>This will remove the post from public view.</p>
+              <p>
+                This removes the post from My Posts and public view. You cannot restore it from the
+                website. To keep it for later, use Unpublish instead.
+              </p>
             </div>
             @if (deleteError()) {
               <p class="delete-error" role="alert">{{ deleteError() }}</p>
@@ -122,7 +148,13 @@
         }
       }
 
-      <app-post-comments [postId]="post.id" />
+      @if (post.status === 'PUBLISHED') {
+        <app-post-comments [postId]="post.id" />
+      } @else {
+        <p class="unpublished-notice">
+          Existing comments are preserved and will appear when you publish again.
+        </p>
+      }
 
       <a class="back-link" routerLink="/community/general">← Back to General discussions</a>
     }

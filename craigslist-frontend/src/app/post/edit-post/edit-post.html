@@ -4,7 +4,7 @@
       <a routerLink="/">Home</a>
       <span aria-hidden="true">/</span>
       @if (returnToMyPosts) {
-        <a routerLink="/my-posts">My Posts</a>
+        <a routerLink="/my-posts" [queryParams]="{ status: publicationStatus() }">My Posts</a>
       } @else {
         <a routerLink="/community">Community</a>
         <span aria-hidden="true">/</span>
@@ -26,6 +26,7 @@
         <p>{{ loadError() }}</p>
         <a
           class="cancel-button"
+          [queryParams]="returnToMyPosts ? { status: publicationStatus() } : {}"
           [routerLink]="returnToMyPosts ? ['/my-posts'] : ['/community/general']"
         >
           {{ returnToMyPosts ? 'Back to My Posts' : 'Back to General' }}
@@ -111,6 +112,7 @@
           <div class="form-actions">
             <a
               class="cancel-button"
+              [queryParams]="returnToMyPosts ? { status: publicationStatus() } : {}"
               [routerLink]="returnToMyPosts ? ['/my-posts'] : ['/posts', postId]"
               >Cancel</a
             >

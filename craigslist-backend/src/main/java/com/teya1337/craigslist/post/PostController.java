@@ -52,8 +52,8 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public PostResponse findPublishedPost(@PathVariable UUID postId) {
-        return postService.findPublishedPost(postId);
+    public PostResponse findPost(@PathVariable UUID postId, @AuthenticationPrincipal UserPrincipal principal) {
+        return postService.findVisiblePost(postId, principal == null ? null : principal.getUserId());
     }
 
     @PostMapping
@@ -72,6 +72,17 @@ public class PostController {
             @Valid @RequestBody PostRequest request
     ) {
         return postService.updatePost(principal.getUserId(), postId, request);
+    }
+
+    public record PublicationRequest(boolean published) {}
+
+    @PutMapping("/{postId}/publication")
+    public PostResponse changePublication(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable UUID postId,
+            @RequestBody PublicationRequest request
+    ) {
+        return postService.changePublication(principal.getUserId(), postId, request.published());
     }
 
     @DeleteMapping("/{postId}")

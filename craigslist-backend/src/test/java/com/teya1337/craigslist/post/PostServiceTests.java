@@ -86,7 +86,7 @@ class PostServiceTests {
                 .status(PostStatus.PUBLISHED).createdAt(java.time.Instant.parse("2026-10-01T00:00:00Z")).build();
         Post newer = Post.builder().id(UUID.randomUUID()).user(owner).title("Newer")
                 .status(PostStatus.PUBLISHED).createdAt(java.time.Instant.parse("2026-10-02T00:00:00Z")).build();
-        Post hidden = Post.builder().status(PostStatus.HIDE).build();
+        Post hidden = Post.builder().status(PostStatus.UNPUBLISHED).build();
         Post deleted = Post.builder().status(PostStatus.DELETED).build();
         Post draft = Post.builder().status(PostStatus.DRAFT).build();
         when(posts.findAllByUserId(userId)).thenReturn(java.util.List.of(hidden, older, deleted, newer, draft));

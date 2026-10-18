@@ -35,6 +35,10 @@ export class PostService {
     return this.http.put<PostResponse>(`/api/posts/${postId}`, post);
   }
 
+  changePublication(postId: string, published: boolean): Observable<PostResponse> {
+    return this.http.put<PostResponse>(`/api/posts/${postId}/publication`, { published });
+  }
+
   deletePost(postId: string): Observable<void> {
     return this.http.delete<void>(`/api/posts/${postId}`);
   }

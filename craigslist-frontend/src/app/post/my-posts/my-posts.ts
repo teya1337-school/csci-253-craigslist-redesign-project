@@ -1,9 +1,19 @@
 import { UserLink } from '../../shared/user-link/user-link';
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, HostListener, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  ElementRef,
+  HostListener,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EditedIndicator } from '../../shared/edited-indicator/edited-indicator';
 import { PostResponse } from '../models/post-response';
 import { PostService } from '../post.service';
@@ -18,6 +28,7 @@ export class MyPosts implements OnInit {
   private readonly postService = inject(PostService);
   private readonly route = inject(ActivatedRoute);
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly destroyRef = inject(DestroyRef);
   private menuTrigger?: HTMLButtonElement;
   protected readonly posts = signal<PostResponse[]>([]);
   protected readonly isLoading = signal(true);
@@ -27,8 +38,27 @@ export class MyPosts implements OnInit {
   protected readonly isDeleting = signal(false);
   protected readonly deleteError = signal<string | null>(null);
   protected readonly statusMessage = signal('');
+  protected readonly selectedStatus = signal<'PUBLISHED' | 'UNPUBLISHED'>('PUBLISHED');
+  protected readonly changingPublication = signal<string | null>(null);
+  protected readonly publicationError = signal('');
+  protected readonly publishedPosts = computed(() =>
+    this.posts().filter((post) => post.status === 'PUBLISHED'),
+  );
+  protected readonly unpublishedPosts = computed(() =>
+    this.posts().filter((post) => post.status === 'UNPUBLISHED'),
+  );
+  protected readonly visiblePosts = computed(() =>
+    this.selectedStatus() === 'PUBLISHED' ? this.publishedPosts() : this.unpublishedPosts(),
+  );
 
   ngOnInit(): void {
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      this.statusMessage.set('');
+      this.publicationError.set('');
+      this.selectedStatus.set(params.get('status') === 'UNPUBLISHED' ? 'UNPUBLISHED' : 'PUBLISHED');
+      this.closeMenu();
+      this.pendingDelete.set(null);
+    });
     if (this.route.snapshot.queryParamMap.get('updated') === 'true') {
       this.statusMessage.set('Your changes were saved.');
     }
@@ -87,6 +117,39 @@ export class MyPosts implements OnInit {
     ];
     const index = items.indexOf(event.target as HTMLElement);
     items[(index + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length]?.focus();
+  }
+
+  protected changePublication(post: PostResponse): void {
+    if (this.changingPublication()) return;
+    this.closeMenu();
+    this.pendingDelete.set(null);
+    this.publicationError.set('');
+    this.statusMessage.set('');
+    this.changingPublication.set(post.id);
+    const published = post.status !== 'PUBLISHED';
+    this.postService
+      .changePublication(post.id, published)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.changingPublication.set(null)),
+      )
+      .subscribe({
+        next: (updated) => {
+          this.posts.update((posts) =>
+            posts.map((item) => (item.id === updated.id ? updated : item)),
+          );
+          this.statusMessage.set(
+            published ? 'Post published.' : 'Post unpublished. Only you can view it.',
+          );
+          setTimeout(() =>
+            this.element.nativeElement
+              .querySelector<HTMLElement>('.publication-tabs .active')
+              ?.focus(),
+          );
+        },
+        error: () =>
+          this.publicationError.set('We could not change publication. Please try again.'),
+      });
   }
 
   protected confirmDelete(post: PostResponse): void {
